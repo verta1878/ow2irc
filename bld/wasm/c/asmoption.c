@@ -5,6 +5,7 @@
  */
 
 #include "asmglob.h"
+#include "clibext.h"
 #include "asmalloc.h"
 
 /*
@@ -60,7 +61,7 @@ static int ParseNoKeyword(token_buffer *tokbuf, int i)
         if (kw[0] == '>' || kw[0] == '\0')
             break;
         if (num_nokeywords < MAX_NOKEYWORDS) {
-            nokeywords[num_nokeywords] = AsmStrDup(kw);
+            nokeywords[num_nokeywords] = strdup(kw);
             num_nokeywords++;
         }
         i++;
@@ -123,7 +124,7 @@ void AsmOptionFini(void)
 {
     int i;
     for (i = 0; i < num_nokeywords; i++) {
-        AsmFree(nokeywords[i]);
+        free(nokeywords[i]);
     }
     num_nokeywords = 0;
 }

@@ -97,6 +97,7 @@ cc_debug_objs = $(_subdir_)cfedump.obj
 #
 cc_objs_i86   = $(_subdir_)cmdlnx86.obj $(_subdir_)cpragx86.obj $(_subdir_)pragi86.obj
 cc_objs_386   = $(_subdir_)cmdlnx86.obj $(_subdir_)cpragx86.obj $(_subdir_)prag386.obj
+cc_objs_x64   = $(_subdir_)cmdlnx86.obj $(_subdir_)cpragx86.obj $(_subdir_)prag386.obj
 cc_objs_axp   = $(_subdir_)cmdlnrsc.obj $(_subdir_)cpragaxp.obj $(_subdir_)pragaxp.obj
 cc_objs_ppc   = $(_subdir_)cmdlnrsc.obj $(_subdir_)cpragppc.obj $(_subdir_)pragppc.obj
 cc_objs_mps   = $(_subdir_)cmdlnrsc.obj $(_subdir_)cpragmps.obj $(_subdir_)pragmips.obj

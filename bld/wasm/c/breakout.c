@@ -44,7 +44,10 @@
 
 /* prototypes */
 
-/* MASM feature extensions (asmoption.c, asmrecord.c, asminvoke.c) */
+/* MASM feature extensions (asmoption.c, asmrecord.c, asminvoke.c)
+ * Only available in standalone wasm builds. When wasm's scanner is
+ * embedded in the C compiler (cc), these are stubbed out. */
+#ifdef _STANDALONE_
 extern int AsmOption( token_buffer *tokbuf, int i );
 extern int AsmInvoke( token_buffer *tokbuf, int i );
 extern int AsmProto( token_buffer *tokbuf, int i );
@@ -52,6 +55,15 @@ extern int AsmRecord( token_buffer *tokbuf, int i );
 extern int AsmTypedef( token_buffer *tokbuf, int i );
 extern int AsmUnion( token_buffer *tokbuf, int i );
 extern bool IsNoKeyword( const char *word );
+#else
+static int AsmOption( token_buffer *tokbuf, int i ) { (void)tokbuf;(void)i; return( 1 ); }
+static int AsmInvoke( token_buffer *tokbuf, int i ) { (void)tokbuf;(void)i; return( 1 ); }
+static int AsmProto( token_buffer *tokbuf, int i ) { (void)tokbuf;(void)i; return( 1 ); }
+static int AsmRecord( token_buffer *tokbuf, int i ) { (void)tokbuf;(void)i; return( 1 ); }
+static int AsmTypedef( token_buffer *tokbuf, int i ) { (void)tokbuf;(void)i; return( 1 ); }
+static int AsmUnion( token_buffer *tokbuf, int i ) { (void)tokbuf;(void)i; return( 1 ); }
+static bool IsNoKeyword( const char *word ) { (void)word; return( false ); }
+#endif
 
 
 bool directive( token_buffer *tokbuf, token_idx i, asm_token direct )
@@ -287,24 +299,12 @@ bool directive( token_buffer *tokbuf, token_idx i, asm_token direct )
         }
     case T_ECHO:
     case T_HIGH:
-    case T_HIGHWORD:
-    case T_LOW:
-    case T_LOWWORD:
-    case T_ADDR:
-    case T_BOUND:
-    case T_CASEMAP:
     case T_OPTION:
         return( AsmOption( tokbuf, i ) );
     case T_INVOKE:
         return( AsmInvoke( tokbuf, i ) );
     case T_PROTO:
         return( AsmProto( tokbuf, i ) );
-    case T_HIGHWORD:
-    case T_LOW:
-    case T_LOWWORD:
-    case T_ADDR:
-    case T_BOUND:
-    case T_CASEMAP:
     case T_LROFFSET:
     case T_OPATTR:
     case T_POPCONTEXT:

@@ -70,3 +70,12 @@ pick( ESP, CI_ESP, 0, 32 )
 pick( FS,  CI_FS,  0, 16 )
 pick( GS,  CI_GS,  0, 16 )
 
+/* x86-64 extended registers (OW2IRC) */
+pick( R8,  CI_R8,  0, 64 )
+pick( R9,  CI_R9,  0, 64 )
+pick( R10, CI_R10, 0, 64 )
+pick( R11, CI_R11, 0, 64 )
+pick( R12, CI_R12, 0, 64 )
+pick( R13, CI_R13, 0, 64 )
+pick( R14, CI_R14, 0, 64 )
+pick( R15, CI_R15, 0, 64 )

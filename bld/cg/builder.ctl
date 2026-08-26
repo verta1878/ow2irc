@@ -8,6 +8,7 @@ set PROJDIR=<CWD>
 cdsay .
 
 [ INCLUDE intel/386/builder.ctl ]
+[ INCLUDE intel/x64/builder.ctl ]
 [ INCLUDE intel/i86/builder.ctl ]
 [ INCLUDE risc/axp/builder.ctl ]
 [ INCLUDE risc/mps/builder.ctl ]

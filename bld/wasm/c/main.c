@@ -32,13 +32,22 @@
 
 #include "asmglob.h"
 
-/* MASM feature extensions init/fini */
+/* MASM feature extensions init/fini — standalone wasm only */
+#ifdef _STANDALONE_
 extern void AsmOptionInit(void);
 extern void AsmOptionFini(void);
 extern void AsmRecordInit(void);
 extern void AsmRecordFini(void);
 extern void AsmInvokeInit(void);
 extern void AsmInvokeFini(void);
+#else
+#define AsmOptionInit()
+#define AsmOptionFini()
+#define AsmRecordInit()
+#define AsmRecordFini()
+#define AsmInvokeInit()
+#define AsmInvokeFini()
+#endif
 #include <ctype.h>
 #ifdef __WATCOMC__
     #include <process.h>

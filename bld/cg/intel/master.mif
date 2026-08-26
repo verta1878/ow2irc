@@ -7,6 +7,14 @@ intel_objs = &
     x64obj.obj &
     x64ehframe.obj &
     x64rodata.obj &
+    x64asm.obj &
+    x64c99compat.obj &
+    x64clib.obj &
+    x64obj_integration.obj &
+    x64parm.obj &
+    x64pe.obj &
+    x64seh.obj &
+    x64win64.obj &
     x86base.obj &
     x86call.obj &
     x86cvsup.obj &
@@ -45,7 +53,7 @@ intel_objs = &
     wvsyms.obj &
     wvtypes.obj
 
-inc_dirs_targ   = -I"$(cg_dir)/$(target_cls)/$(target_cpu)/h" -I"$(cg_dir)/$(target_cls)/h" -I"$(cg_dir)/$(target_cls)/x64/h" $(cli_owl_inc_dirs)
+inc_dirs_targ   = -I"$(cg_dir)/$(target_cls)/$(target_cpu)/h" -I"$(cg_dir)/$(target_cls)/h" -I"$(cg_dir)/$(target_cls)/x64/h" -I"$(cg_dir)/$(target_cls)/386/h" $(cli_owl_inc_dirs)
 src_path        = $(cg_dir)/$(target_cls)/$(target_cpu)/c;$(cg_dir)/$(target_cls)/c;$(cg_dir)/$(target_cls)/x64/c
 
 !include $(cg_dir)/mif/master.mif

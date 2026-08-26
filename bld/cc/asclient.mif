@@ -1,0 +1,4 @@
+# asclient.mif — inline assembler client for CC
+# Include cdirs.mif to get wasm_dir, then client.mif for inline asm
+!include cdirs.mif
+!include $(wasm_dir)/client.mif

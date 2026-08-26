@@ -327,6 +327,32 @@ enum {
     CI_JVM_vars,
     CI_JVM_optop,
     CI_JVM_frame,
+    /* x86-64 extended GPRs (OW2IRC) */
+    CI_R8,
+    CI_R9,
+    CI_R10,
+    CI_R11,
+    CI_R12,
+    CI_R13,
+    CI_R14,
+    CI_R15,
+    /* x86-64 XMM registers (OW2IRC) */
+    CI_XMM0,
+    CI_XMM1,
+    CI_XMM2,
+    CI_XMM3,
+    CI_XMM4,
+    CI_XMM5,
+    CI_XMM6,
+    CI_XMM7,
+    CI_XMM8,
+    CI_XMM9,
+    CI_XMM10,
+    CI_XMM11,
+    CI_XMM12,
+    CI_XMM13,
+    CI_XMM14,
+    CI_XMM15,
     CI_LAST
 };
 

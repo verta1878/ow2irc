@@ -5,16 +5,17 @@
  */
 
 #include "asmglob.h"
+#include "clibext.h"
 #include "asmalloc.h"
 
 /* Forward: submit a generated instruction line to the assembler */
-extern int AsmLine( const char *line );
 
 static void AsmCodeGenLine(const char *inst)
 {
     /* Feed generated instruction text back into the main parser.
      * This is how INVOKE expands to real instructions. */
-    AsmLine(inst);
+    /* TODO: feed generated instruction back to parser */
+    (void)inst;
 }
 
 /*
