@@ -1,0 +1,4 @@
+	.text
+	.globl	wcscmpi
+wcscmpi:
+	b	_wcsicmp

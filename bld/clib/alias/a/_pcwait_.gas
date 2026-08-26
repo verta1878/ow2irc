@@ -1,0 +1,4 @@
+	.text
+	.globl	_cwait
+_cwait:
+	b	cwait

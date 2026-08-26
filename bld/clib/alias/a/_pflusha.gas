@@ -1,0 +1,4 @@
+	.text
+	.globl	_flushall
+_flushall:
+	b	flushall

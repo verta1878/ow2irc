@@ -1,0 +1,57 @@
+#ifndef A_BIT_SET_DEFINED
+typedef unsigned a_bit_set;
+#define A_BIT_SET_DEFINED
+#endif
+
+#define _LBit_SIZE 32
+
+typedef struct local_bit_set {
+	a_bit_set	_0;
+} local_bit_set;
+
+#define _LBitAssign( dst, src ) { \
+			(dst)._0 = (src)._0; \
+		}
+
+#define _LBitEmpty( set ) ( \
+			(set)._0 == 0  )
+
+#define _LBitSet( dst, a ) { \
+			(dst)._0 = (a_bit_set)a; \
+		}
+
+#define _LBitFirst( set ) _LBitSet( set, 1 )
+
+#define _LBitInit( set, val ) _LBitSet( set, val )
+
+#define _LBitIter( routine, set ) { \
+			(routine)( (set)._0 ); \
+		}
+
+#define _LBitOverlap( a, b ) ( \
+			( (a)._0 & (b)._0 ) )
+
+#define _LBitSame( a, b ) ( \
+			( (a)._0 == (b)._0 ) )
+
+#define _LBitTurnOff( a, b ) { \
+			(a)._0 &= ~(b)._0; \
+		}
+
+#define _LBitIntersect( a, b ) { \
+			(a)._0 &= (b)._0; \
+		}
+
+#define _LBitTurnOn( a, b ) { \
+			(a)._0 |= (b)._0; \
+		}
+
+#define _LBitScalar( a ) ( (a)._0 )
+
+#ifdef _LBit_DEFINE_BITNEXT
+static void _LBitNext( local_bit_set *set ) {
+
+    (*set)._0 <<= 1;
+}
+#endif
+

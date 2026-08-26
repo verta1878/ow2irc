@@ -1,0 +1,34 @@
+# OW2IRC .gitignore — allows all project directories
+# Build artifacts:
+*.o
+*.obj
+*.lo
+*.sym
+*.err
+*.map
+*.lst
+*.exe
+*.exp
+*.lib
+*.a
+*.res
+*.pch
+
+# Build output directories (inside bld/):
+**/binbuild/
+**/obj/
+
+# OS files:
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs (allow our specific ones):
+*.log
+!CLEANUP.LOG
+!RESTRUCTURE.LOG
+
+# IDE files:
+*.swp
+*.swo
+*~

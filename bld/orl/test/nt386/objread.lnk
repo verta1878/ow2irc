@@ -1,0 +1,4 @@
+debug dwarf op nored op symfile op map, statics sys nt   
+file test.obj
+file trmemcvr.obj
+library ../../../../bld/orl/nt386/orl.lib

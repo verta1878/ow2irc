@@ -1,0 +1,4 @@
+	.text
+	.globl	_access
+_access:
+	j	access

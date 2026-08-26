@@ -1,0 +1,4 @@
+	.text
+	.globl	_putws
+_putws:
+	b	putws

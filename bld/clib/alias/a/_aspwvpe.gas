@@ -1,0 +1,4 @@
+	.text
+	.globl	_spawnvpe
+_spawnvpe:
+	br	spawnvpe

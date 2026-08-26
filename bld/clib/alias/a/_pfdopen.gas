@@ -1,0 +1,4 @@
+	.text
+	.globl	_fdopen
+_fdopen:
+	b	fdopen

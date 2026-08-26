@@ -1,0 +1,4 @@
+	.text
+	.globl	_setenv
+_setenv:
+	b	setenv

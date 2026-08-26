@@ -1,0 +1,4 @@
+debug dwarf op nored op symfile op map, statics sys os2v2   
+file test.obj
+file trmemcvr.obj
+library ../../../../bld/orl/os2386/orl.lib

@@ -1,0 +1,4 @@
++../../../bios/library/msdos.286/ms/clibs.lib
++../../../intel/library/msdos.286/ms/clibs.lib
++../../../_dos/library/msdos.286/ms/clibs.lib
++timstamp.obj

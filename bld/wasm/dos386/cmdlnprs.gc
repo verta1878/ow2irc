@@ -1,0 +1,371 @@
+bool OPT_PROCESS( OPT_STORAGE *data )
+{
+    switch( OPT_GET_LOWER() ) {
+    case 'z':
+	switch( OPT_GET_LOWER() ) {
+	case 'l':
+	    if( OPT_RECOG_LOWER( 'd' ) ) {
+		data->zld = true;
+		return( false );
+	    }
+	    return( true );
+	case 'c':
+	    if( OPT_RECOG_LOWER( 'm' ) ) {
+		if( scanMode( &(data->zcm_value) ) ) {
+		    data->zcm = true;
+		}
+		return( false );
+	    }
+	    return( true );
+	case 'q':
+	    data->zq = true;
+	    return( false );
+	case 'z':
+	    if( OPT_RECOG_LOWER( 'o' ) ) {
+		data->zzo = true;
+		return( false );
+	    }
+	    data->zz = true;
+	    return( false );
+	}
+	OPT_UNGET();
+	return( true );
+    case 'n':
+	switch( OPT_GET_LOWER() ) {
+	case 'c':
+	    if( OPT_GET_ID( &(data->nc_value) ) ) {
+		data->nc = true;
+	    }
+	    return( false );
+	case 'd':
+	    if( OPT_GET_ID( &(data->nd_value) ) ) {
+		data->nd = true;
+	    }
+	    return( false );
+	case 'm':
+	    if( OPT_GET_FILE( &(data->nm_value) ) ) {
+		data->nm = true;
+	    }
+	    return( false );
+	case 't':
+	    if( OPT_GET_ID( &(data->nt_value) ) ) {
+		data->nt = true;
+	    }
+	    return( false );
+	}
+	OPT_UNGET();
+	return( true );
+    case 'm':
+	switch( OPT_GET_LOWER() ) {
+	case 'c':
+	    data->mem_model = OPT_ENUM_mem_model_mc;
+	    return( false );
+	case 'f':
+	    data->mem_model = OPT_ENUM_mem_model_mf;
+	    return( false );
+	case 'h':
+	    data->mem_model = OPT_ENUM_mem_model_mh;
+	    return( false );
+	case 'l':
+	    data->mem_model = OPT_ENUM_mem_model_ml;
+	    return( false );
+	case 'm':
+	    data->mem_model = OPT_ENUM_mem_model_mm;
+	    return( false );
+	case 's':
+	    data->mem_model = OPT_ENUM_mem_model_ms;
+	    return( false );
+	case 't':
+	    data->mem_model = OPT_ENUM_mem_model_mt;
+	    return( false );
+	}
+	OPT_UNGET();
+	return( true );
+    case 'f':
+	switch( OPT_GET_LOWER() ) {
+	case 'p':
+	    switch( OPT_GET_LOWER() ) {
+	    case '0':
+		data->fpu_info = OPT_ENUM_fpu_info_fp0;
+		return( false );
+	    case '2':
+		data->fpu_info = OPT_ENUM_fpu_info_fp2;
+		return( false );
+	    case '3':
+		data->fpu_info = OPT_ENUM_fpu_info_fp3;
+		return( false );
+	    case '5':
+		data->fpu_info = OPT_ENUM_fpu_info_fp5;
+		return( false );
+	    case '6':
+		data->fpu_info = OPT_ENUM_fpu_info_fp6;
+		return( false );
+	    case 'c':
+		data->fpu_type = OPT_ENUM_fpu_type_fpc;
+		return( false );
+	    case 'i':
+		if( OPT_RECOG_LOWER( '8' ) ) {
+		    if( OPT_RECOG_LOWER( '7' ) ) {
+			data->fpu_type = OPT_ENUM_fpu_type_fpi87;
+			return( false );
+		    }
+		    return( true );
+		}
+		data->fpu_type = OPT_ENUM_fpu_type_fpi;
+		return( false );
+	    }
+	    OPT_UNGET();
+	    return( true );
+	case 'e':
+	    if( OPT_GET_FILE_OPT( &(data->fe_value) ) ) {
+		data->fe = true;
+	    }
+	    return( false );
+	case 'i':
+	    if( OPT_GET_FILE( &(data->fi_value) ) ) {
+		data->fi = true;
+	    }
+	    return( false );
+	case 'l':
+	    if( OPT_GET_FILE( &(data->fl_value) ) ) {
+		data->fl = true;
+	    }
+	    return( false );
+	case 'o':
+	    if( OPT_GET_FILE_OPT( &(data->fo_value) ) ) {
+		data->fo = true;
+	    }
+	    return( false );
+	case 'r':
+	    if( OPT_GET_FILE_OPT( &(data->fr_value) ) ) {
+		data->fr = true;
+	    }
+	    return( false );
+	}
+	OPT_UNGET();
+	return( true );
+    case 'b':
+	if( OPT_RECOG_LOWER( 't' ) ) {
+	    if( OPT_GET_ID_OPT( &(data->bt_value) ) ) {
+		data->bt = true;
+	    }
+	    return( false );
+	}
+	return( true );
+    case '?':
+	data->_question = true;
+	return( false );
+    case '0':
+	data->cpu_info = OPT_ENUM_cpu_info__0;
+	return( false );
+    case '1':
+	data->cpu_info = OPT_ENUM_cpu_info__1;
+	return( false );
+    case '2':
+	do {
+	    if( OPT_RECOG_LOWER( 'p' ) ) {
+		data->_2p = true;
+		continue;
+	    }
+	    break;
+	} while( ! OPT_END() );
+	data->cpu_info = OPT_ENUM_cpu_info__2;
+	return( false );
+    case '3':
+	do {
+	    if( OPT_RECOG_LOWER( 'r' ) ) {
+		data->_3r = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 's' ) ) {
+		data->_3s = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 'p' ) ) {
+		data->_3p = true;
+		continue;
+	    }
+	    break;
+	} while( ! OPT_END() );
+	data->cpu_info = OPT_ENUM_cpu_info__3;
+	return( false );
+    case '4':
+	do {
+	    if( OPT_RECOG_LOWER( 'r' ) ) {
+		data->_4r = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 's' ) ) {
+		data->_4s = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 'p' ) ) {
+		data->_4p = true;
+		continue;
+	    }
+	    break;
+	} while( ! OPT_END() );
+	data->cpu_info = OPT_ENUM_cpu_info__4;
+	return( false );
+    case '5':
+	do {
+	    if( OPT_RECOG_LOWER( 'r' ) ) {
+		data->_5r = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 's' ) ) {
+		data->_5s = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 'p' ) ) {
+		data->_5p = true;
+		continue;
+	    }
+	    break;
+	} while( ! OPT_END() );
+	data->cpu_info = OPT_ENUM_cpu_info__5;
+	return( false );
+    case '6':
+	do {
+	    if( OPT_RECOG_LOWER( 'r' ) ) {
+		data->_6r = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 's' ) ) {
+		data->_6s = true;
+		continue;
+	    }
+	    if( OPT_RECOG_LOWER( 'p' ) ) {
+		data->_6p = true;
+		continue;
+	    }
+	    break;
+	} while( ! OPT_END() );
+	data->cpu_info = OPT_ENUM_cpu_info__6;
+	return( false );
+    case 'c':
+	if( OPT_RECOG_LOWER( 'x' ) ) {
+	    data->cx = true;
+	    return( false );
+	}
+	data->c = true;
+	return( false );
+    case 'd':
+	switch( OPT_GET_LOWER() ) {
+	case '+':
+	    data->ignore = OPT_ENUM_ignore_d_plus;
+	    return( false );
+	case '0':
+	    data->debug_info = OPT_ENUM_debug_info_d0;
+	    return( false );
+	case '1':
+	    data->debug_info = OPT_ENUM_debug_info_d1;
+	    return( false );
+	case '2':
+	    data->debug_info = OPT_ENUM_debug_info_d2;
+	    return( false );
+	case '3':
+	    data->debug_info = OPT_ENUM_debug_info_d3;
+	    return( false );
+	}
+	OPT_UNGET();
+	if( scanDefine( &(data->d_value) ) ) {
+	    data->d = true;
+	}
+	return( false );
+    case 'e':
+	if( OPT_RECOG_LOWER( 'e' ) ) {
+	    data->ee = true;
+	    return( false );
+	}
+	if( OPT_GET_NUMBER( &(data->e_value) ) ) {
+	    data->e = true;
+	}
+	return( false );
+    case 'h':
+	if( OPT_RECOG_LOWER( 'c' ) ) {
+	    data->ignore = OPT_ENUM_ignore_hc;
+	    return( false );
+	}
+	if( OPT_RECOG_LOWER( 'd' ) ) {
+	    data->ignore = OPT_ENUM_ignore_hd;
+	    return( false );
+	}
+	if( OPT_RECOG_LOWER( 'w' ) ) {
+	    data->ignore = OPT_ENUM_ignore_hw;
+	    return( false );
+	}
+	data->_question = true;
+	return( false );
+    case 'i':
+	if( OPT_GET_PATH( &(data->i_value) ) ) {
+	    data->i = true;
+	}
+	return( false );
+    case 'j':
+	data->j = true;
+	return( false );
+    case 's':
+	data->j = true;
+	return( false );
+    case 'o':
+	if( OPT_RECOG_LOWER( 'd' ) ) {
+	    data->od = true;
+	    return( false );
+	}
+	if( OPT_RECOG_LOWER( 'f' ) ) {
+	    if( OPT_RECOG_LOWER( '+' ) ) {
+		data->trace_stack = OPT_ENUM_trace_stack_of_plus;
+		return( false );
+	    }
+	    data->trace_stack = OPT_ENUM_trace_stack_of;
+	    return( false );
+	}
+	data->o = true;
+	return( false );
+    case 'q':
+	data->zq = true;
+	return( false );
+    case 'w':
+	if( OPT_RECOG_LOWER( 'e' ) ) {
+	    data->we = true;
+	    return( false );
+	}
+	if( OPT_RECOG_LOWER( 'x' ) ) {
+	    data->wx = true;
+	    return( false );
+	}
+	if( OPT_GET_NUMBER( &(data->w_value) ) ) {
+	    data->w = true;
+	}
+	return( false );
+    }
+    OPT_UNGET();
+    return( true );
+}
+void OPT_INIT( OPT_STORAGE *data )
+{
+    memset( data, 0, sizeof( *data ) );
+    data->trace_stack = OPT_ENUM_trace_stack_default;
+    data->mem_model = OPT_ENUM_mem_model_default;
+    data->fpu_type = OPT_ENUM_fpu_type_default;
+    data->fpu_info = OPT_ENUM_fpu_info_default;
+    data->debug_info = OPT_ENUM_debug_info_default;
+    data->ignore = OPT_ENUM_ignore_default;
+    data->cpu_info = OPT_ENUM_cpu_info_default;
+}
+void OPT_FINI( OPT_STORAGE *data )
+{
+    OPT_CLEAN_STRING( &(data->nt_value) );
+    OPT_CLEAN_STRING( &(data->nm_value) );
+    OPT_CLEAN_STRING( &(data->nd_value) );
+    OPT_CLEAN_STRING( &(data->nc_value) );
+    OPT_CLEAN_STRING( &(data->i_value) );
+    OPT_CLEAN_STRING( &(data->fr_value) );
+    OPT_CLEAN_STRING( &(data->fo_value) );
+    OPT_CLEAN_STRING( &(data->fl_value) );
+    OPT_CLEAN_STRING( &(data->fi_value) );
+    OPT_CLEAN_STRING( &(data->fe_value) );
+    OPT_CLEAN_STRING( &(data->d_value) );
+    OPT_CLEAN_STRING( &(data->bt_value) );
+}

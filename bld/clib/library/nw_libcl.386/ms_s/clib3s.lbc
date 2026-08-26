@@ -1,0 +1,14 @@
++../../../alias/library/nw_libcl.386/ms_s/clib3s.lib
++../../../fpu/library/nw_libcl.386/ms_s/clib3s.lib
++../../../cgsupp/library/nw_libcl.386/ms_s/clib3s.lib
++../../../convert/library/nw_libcl.386/ms_s/clib3s.lib
++../../../file/library/nw_libcl.386/ms_s/clib3s.lib
++../../../handleio/library/nw_libcl.386/ms_s/clib3s.lib
++../../../intel/library/nw_libcl.386/ms_s/clib3s.lib
++../../../memory/library/nw_libcl.386/ms_s/clib3s.lib
++../../../misc/library/nw_libcl.386/ms_s/clib3s.lib
++../../../mthread/library/nw_libcl.386/ms_s/clib3s.lib
++../../../startup/library/nw_libcl.386/ms_s/clib3s.lib
++../../../streamio/library/nw_libcl.386/ms_s/clib3s.lib
++../../../string/library/nw_libcl.386/ms_s/clib3s.lib
++timstamp.obj

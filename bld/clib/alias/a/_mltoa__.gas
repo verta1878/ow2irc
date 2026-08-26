@@ -1,0 +1,4 @@
+	.text
+	.globl	_ltoa
+_ltoa:
+	j	ltoa

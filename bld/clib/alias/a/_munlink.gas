@@ -1,0 +1,4 @@
+	.text
+	.globl	_unlink
+_unlink:
+	j	unlink

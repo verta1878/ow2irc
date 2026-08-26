@@ -1,0 +1,4 @@
+	.text
+	.globl	strcasecmp
+strcasecmp:
+	b	_stricmp

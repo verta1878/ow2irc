@@ -1,0 +1,4 @@
+	.text
+	.globl	_stricoll
+_stricoll:
+	j	_stricmp

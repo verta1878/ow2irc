@@ -1,0 +1,4 @@
+	.text
+	.globl	_fileno
+_fileno:
+	j	fileno

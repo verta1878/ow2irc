@@ -1,0 +1,4 @@
+	.text
+	.globl	rindex
+rindex:
+	br	strrchr

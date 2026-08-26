@@ -1,0 +1,4 @@
+	.text
+	.globl	_getch
+_getch:
+	b	getch

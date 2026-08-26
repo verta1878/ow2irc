@@ -1,0 +1,5 @@
+debug dwarf op nored op symfile op map, statics sys nt   
+file maindrv.obj
+file idedrv.obj
+file idemsgfm.obj
+library wlibd.lib

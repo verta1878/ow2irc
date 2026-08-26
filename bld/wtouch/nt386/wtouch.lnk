@@ -1,0 +1,4 @@
+debug dwarf op nored op symfile op map, statics sys nt   
+file touch.obj
+file dtparse.obj
+file wtmsg.obj

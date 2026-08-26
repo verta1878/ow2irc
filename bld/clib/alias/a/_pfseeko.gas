@@ -1,0 +1,4 @@
+	.text
+	.globl	fseeko
+fseeko:
+	b	fseek

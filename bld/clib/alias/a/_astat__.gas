@@ -1,0 +1,4 @@
+	.text
+	.globl	_stat
+_stat:
+	br	stat

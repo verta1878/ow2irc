@@ -1,0 +1,4 @@
+	.text
+	.globl	endpwent
+endpwent:
+	b	setpwent

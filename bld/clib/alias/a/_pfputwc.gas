@@ -1,0 +1,4 @@
+	.text
+	.globl	_fputwchar
+_fputwchar:
+	b	fputwchar

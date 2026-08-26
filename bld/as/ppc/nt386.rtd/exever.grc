@@ -1,0 +1,9 @@
+#define VERINFO_EXE
+#define VERINFO_FILEVERSION             2, 0, 0x6a8e, 0x6d4
+#define VERINFO_PRODUCTVERSION          2, 0, 0x6a8e, 0x6d4
+#define VERINFO_FILEDESCRIPTION_STR     "Open Watcom PowerPC Assembler"
+#define VERINFO_FILEVERSION_STR         "2.0"
+#define VERINFO_INTERNALNAME_STR        "wasppc"
+#define VERINFO_PRODUCTVERSION_STR      "2.0"
+
+#include "cmnvinfo.rc"

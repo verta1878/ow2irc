@@ -1,0 +1,4 @@
+	.text
+	.globl	finite
+finite:
+	br	_finite

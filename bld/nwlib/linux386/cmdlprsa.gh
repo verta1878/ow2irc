@@ -1,0 +1,15 @@
+typedef struct opt_storage_A OPT_STORAGE_A;
+struct opt_storage_A {
+    unsigned     timestamp;
+    boolbit      x : 1;
+    boolbit      v : 1;
+    boolbit      u : 1;
+    boolbit      t : 1;
+    boolbit      r : 1;
+    boolbit      d : 1;
+    boolbit      c : 1;
+    boolbit      _question : 1;
+};
+extern void OPT_INIT_A( OPT_STORAGE_A *data );
+extern void OPT_FINI_A( OPT_STORAGE_A *data );
+extern bool OPT_PROCESS_A( OPT_STORAGE_A *data );

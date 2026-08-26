@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcscspn
+_tcscspn:
+	br	_mbscspn

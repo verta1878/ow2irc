@@ -1,0 +1,4 @@
+	.text
+	.globl	_tccpy
+_tccpy:
+	b	_mbccpy

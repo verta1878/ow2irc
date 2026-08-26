@@ -1,0 +1,4 @@
+	.text
+	.globl	bcopy
+bcopy:
+	b	memmove

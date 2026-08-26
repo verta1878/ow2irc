@@ -1,0 +1,4 @@
+	.text
+	.globl	_strnicoll
+_strnicoll:
+	br	_strnicmp

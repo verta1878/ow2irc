@@ -1,0 +1,4 @@
+	.text
+	.globl	strcmpi
+strcmpi:
+	j	_stricmp

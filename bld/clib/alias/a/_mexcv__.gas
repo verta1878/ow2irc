@@ -1,0 +1,4 @@
+	.text
+	.globl	_execv
+_execv:
+	j	execv

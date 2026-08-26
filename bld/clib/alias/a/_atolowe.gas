@@ -1,0 +1,4 @@
+	.text
+	.globl	_tolower
+_tolower:
+	br	tolower

@@ -1,0 +1,4 @@
+	.text
+	.globl	sopen
+sopen:
+	br	_sopen

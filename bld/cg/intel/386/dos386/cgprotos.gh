@@ -1,0 +1,236 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+#define BEMemInit (CGFuncTable->BEMemInit)
+#define BEInitCg (CGFuncTable->BEInitCg)
+#define BEInit (CGFuncTable->BEInit)
+#define BEStart (CGFuncTable->BEStart)
+#define BEStop (CGFuncTable->BEStop)
+#define BEAbort (CGFuncTable->BEAbort)
+#define BEFini (CGFuncTable->BEFini)
+#define BEFiniCg (CGFuncTable->BEFiniCg)
+#define BEMemAlloc (CGFuncTable->BEMemAlloc)
+#define BEMemFree (CGFuncTable->BEMemFree)
+#define BEMemFini (CGFuncTable->BEMemFini)
+#define BEGetSeg (CGFuncTable->BEGetSeg)
+#define BESetSeg (CGFuncTable->BESetSeg)
+#define BEFlushSeg (CGFuncTable->BEFlushSeg)
+#define BEDefSeg (CGFuncTable->BEDefSeg)
+#define BENewBack (CGFuncTable->BENewBack)
+#define BEFiniBack (CGFuncTable->BEFiniBack)
+#define BEFreeBack (CGFuncTable->BEFreeBack)
+#define BEDefType (CGFuncTable->BEDefType)
+#define BEAliasType (CGFuncTable->BEAliasType)
+#define BETypeLength (CGFuncTable->BETypeLength)
+#define BETypeAlign (CGFuncTable->BETypeAlign)
+#define BEUnrollCount (CGFuncTable->BEUnrollCount)
+#define BENewLabel (CGFuncTable->BENewLabel)
+#define BEFiniLabel (CGFuncTable->BEFiniLabel)
+#define BEPatch (CGFuncTable->BEPatch)
+#define BEPatchInteger (CGFuncTable->BEPatchInteger)
+#define BEFiniPatch (CGFuncTable->BEFiniPatch)
+
+#define CGBitMask (CGFuncTable->CGBitMask)
+#define CGChoose (CGFuncTable->CGChoose)
+#define CGIndex (CGFuncTable->CGIndex)
+#define CGWarp (CGFuncTable->CGWarp)
+#define CG3WayControl (CGFuncTable->CG3WayControl)
+#define CGFlow (CGFuncTable->CGFlow)
+#define CGPostGets (CGFuncTable->CGPostGets)
+#define CGPreGets (CGFuncTable->CGPreGets)
+#define CGLVPreGets (CGFuncTable->CGLVPreGets)
+#define CGSelectRestricted (CGFuncTable->CGSelectRestricted)
+#define CGUnary (CGFuncTable->CGUnary)
+#define CGBinary (CGFuncTable->CGBinary)
+#define CGAssign (CGFuncTable->CGAssign)
+#define CGLVAssign (CGFuncTable->CGLVAssign)
+#define CGProcDecl (CGFuncTable->CGProcDecl)
+#define CGParmDecl (CGFuncTable->CGParmDecl)
+#define CGLastParm (CGFuncTable->CGLastParm)
+#define CGInitCall (CGFuncTable->CGInitCall)
+#define CGAddParm (CGFuncTable->CGAddParm)
+#define CGCall (CGFuncTable->CGCall)
+#define CGReturn (CGFuncTable->CGReturn)
+#define CGCompare (CGFuncTable->CGCompare)
+#define CGControl (CGFuncTable->CGControl)
+#define CGDone (CGFuncTable->CGDone)
+#define CGTrash (CGFuncTable->CGTrash)
+#define CGAttr (CGFuncTable->CGAttr)
+#define CGVolatile (CGFuncTable->CGVolatile)
+#define CGBigLabel (CGFuncTable->CGBigLabel)
+#define CGBigGoto (CGFuncTable->CGBigGoto)
+#define CGDuplicate (CGFuncTable->CGDuplicate)
+#define CGType (CGFuncTable->CGType)
+#define CGEval (CGFuncTable->CGEval)
+#define CGVarargsBasePtr (CGFuncTable->CGVarargsBasePtr)
+
+#define CGCallback (CGFuncTable->CGCallback)
+#define CGPatchNode (CGFuncTable->CGPatchNode)
+
+#define CGFloat (CGFuncTable->CGFloat)
+#define CGInteger (CGFuncTable->CGInteger)
+#define CGInt64 (CGFuncTable->CGInt64)
+
+#define CGBackName (CGFuncTable->CGBackName)
+#define CGFEName (CGFuncTable->CGFEName)
+#define CGTempName (CGFuncTable->CGTempName)
+#define CGTemp (CGFuncTable->CGTemp)
+#define CGAutoDecl (CGFuncTable->CGAutoDecl)
+
+#define CGSelInit (CGFuncTable->CGSelInit)
+#define CGSelCase (CGFuncTable->CGSelCase)
+#define CGSelRange (CGFuncTable->CGSelRange)
+#define CGSelOther (CGFuncTable->CGSelOther)
+#define CGSelect (CGFuncTable->CGSelect)
+
+#define DGLabel (CGFuncTable->DGLabel)
+#define DGTell (CGFuncTable->DGTell)
+#define DGBackTell (CGFuncTable->DGBackTell)
+#define DGBackPtr (CGFuncTable->DGBackPtr)
+#define DGFEPtr (CGFuncTable->DGFEPtr)
+#define DGInteger (CGFuncTable->DGInteger)
+#define DGInteger64 (CGFuncTable->DGInteger64)
+#define DGFloat (CGFuncTable->DGFloat)
+#define DGChar (CGFuncTable->DGChar)
+#define DGString (CGFuncTable->DGString)
+#define DGBytes (CGFuncTable->DGBytes)
+#define DGIBytes (CGFuncTable->DGIBytes)
+#define DGUBytes (CGFuncTable->DGUBytes)
+#define DGAlign (CGFuncTable->DGAlign)
+#define DGSeek (CGFuncTable->DGSeek)
+#define DGCFloat (CGFuncTable->DGCFloat)
+
+#define DBLineNum (CGFuncTable->DBLineNum)
+#define DBModSym (CGFuncTable->DBModSym)
+#define DBLocalSym (CGFuncTable->DBLocalSym)
+#define DBTypeDef (CGFuncTable->DBTypeDef)
+#define DBLocalType (CGFuncTable->DBLocalType)
+#define DBScalar (CGFuncTable->DBScalar)
+#define DBFtnType (CGFuncTable->DBFtnType)
+#define DBDereference (CGFuncTable->DBDereference)
+#define DBIndCharBlock (CGFuncTable->DBIndCharBlock)
+#define DBLocCharBlock (CGFuncTable->DBLocCharBlock)
+#define DBCharBlock (CGFuncTable->DBCharBlock)
+#define DBCharBlockNamed (CGFuncTable->DBCharBlockNamed)
+#define DBScope (CGFuncTable->DBScope)
+#define DBNested (CGFuncTable->DBNested)
+#define DBBegName (CGFuncTable->DBBegName)
+#define DBForward (CGFuncTable->DBForward)
+#define DBEndName (CGFuncTable->DBEndName)
+#define DBArray (CGFuncTable->DBArray)
+#define DBBegArray (CGFuncTable->DBBegArray)
+#define DBDimCon (CGFuncTable->DBDimCon)
+#define DBDimVar (CGFuncTable->DBDimVar)
+#define DBEndArray (CGFuncTable->DBEndArray)
+#define DBFtnArray (CGFuncTable->DBFtnArray)
+#define DBIntArray (CGFuncTable->DBIntArray)
+#define DBIntArrayCG (CGFuncTable->DBIntArrayCG)
+#define DBSubRange (CGFuncTable->DBSubRange)
+#define DBPtr (CGFuncTable->DBPtr)
+#define DBBegStruct (CGFuncTable->DBBegStruct)
+#define DBBegNameStruct (CGFuncTable->DBBegNameStruct)
+#define DBStructForward (CGFuncTable->DBStructForward)
+#define DBAddField (CGFuncTable->DBAddField)
+#define DBAddBitField (CGFuncTable->DBAddBitField)
+#define DBAddStField (CGFuncTable->DBAddStField)
+#define DBAddMethod (CGFuncTable->DBAddMethod)
+#define DBAddNestedType (CGFuncTable->DBAddNestedType)
+#define DBEndStruct (CGFuncTable->DBEndStruct)
+#define DBBegEnum (CGFuncTable->DBBegEnum)
+#define DBAddConst (CGFuncTable->DBAddConst)
+#define DBAddConst64 (CGFuncTable->DBAddConst64)
+#define DBEndEnum (CGFuncTable->DBEndEnum)
+#define DBBegProc (CGFuncTable->DBBegProc)
+#define DBAddMethParms (CGFuncTable->DBAddMethParms)
+#define DBAddParm (CGFuncTable->DBAddParm)
+#define DBEndProc (CGFuncTable->DBEndProc)
+#define DBGenSym (CGFuncTable->DBGenSym)
+#define DBGenStMem (CGFuncTable->DBGenStMem)
+#define DBBasedPtr (CGFuncTable->DBBasedPtr)
+#define DBAddLocField (CGFuncTable->DBAddLocField)
+#define DBAddInheritance (CGFuncTable->DBAddInheritance)
+#define DBAddBaseInfo (CGFuncTable->DBAddBaseInfo)
+#define DBAddVFuncInfo (CGFuncTable->DBAddVFuncInfo)
+#define DBLocInit (CGFuncTable->DBLocInit)
+#define DBLocSym (CGFuncTable->DBLocSym)
+#define DBLocTemp (CGFuncTable->DBLocTemp)
+#define DBLocConst (CGFuncTable->DBLocConst)
+#define DBLocOp (CGFuncTable->DBLocOp)
+#define DBLocFini (CGFuncTable->DBLocFini)
+#define DBObject (CGFuncTable->DBObject)
+#define DBSrcFile (CGFuncTable->DBSrcFile)
+#define DBSrcCue (CGFuncTable->DBSrcCue)
+#define DBBegBlock (CGFuncTable->DBBegBlock)
+#define DBEndBlock (CGFuncTable->DBEndBlock)
+#define DFClient (CGFuncTable->DFClient)
+#define DFDwarfLocal (CGFuncTable->DFDwarfLocal)
+
+
+
+

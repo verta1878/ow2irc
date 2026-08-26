@@ -1,0 +1,4 @@
+	.text
+	.globl	_wcsnicoll
+_wcsnicoll:
+	j	_wcsnicmp

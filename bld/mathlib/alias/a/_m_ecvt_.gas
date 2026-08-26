@@ -1,0 +1,4 @@
+	.text
+	.globl	_ecvt
+_ecvt:
+	j	ecvt

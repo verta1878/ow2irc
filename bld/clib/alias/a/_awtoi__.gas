@@ -1,0 +1,4 @@
+	.text
+	.globl	_watoi
+_watoi:
+	br	_wtoi

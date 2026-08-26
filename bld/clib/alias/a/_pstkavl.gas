@@ -1,0 +1,4 @@
+	.text
+	.globl	_stackavail
+_stackavail:
+	b	stackavail

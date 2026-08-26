@@ -1,0 +1,4 @@
+	.text
+	.globl	_strncoll
+_strncoll:
+	j	strncmp

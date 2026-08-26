@@ -1,0 +1,4 @@
+	.text
+	.globl	_umask
+_umask:
+	br	umask

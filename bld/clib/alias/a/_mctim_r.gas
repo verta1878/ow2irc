@@ -1,0 +1,4 @@
+	.text
+	.globl	ctime_r
+ctime_r:
+	j	_ctime

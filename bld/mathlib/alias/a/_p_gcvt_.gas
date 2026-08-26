@@ -1,0 +1,4 @@
+	.text
+	.globl	_gcvt
+_gcvt:
+	b	gcvt

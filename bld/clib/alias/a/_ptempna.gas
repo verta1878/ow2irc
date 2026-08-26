@@ -1,0 +1,4 @@
+	.text
+	.globl	_tempnam
+_tempnam:
+	b	tempnam

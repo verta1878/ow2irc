@@ -1,0 +1,4 @@
+	.text
+	.globl	_execlp
+_execlp:
+	b	execlp

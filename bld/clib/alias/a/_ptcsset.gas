@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsset
+_tcsset:
+	b	_mbsset

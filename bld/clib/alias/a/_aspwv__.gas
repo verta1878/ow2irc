@@ -1,0 +1,4 @@
+	.text
+	.globl	_spawnv
+_spawnv:
+	br	spawnv

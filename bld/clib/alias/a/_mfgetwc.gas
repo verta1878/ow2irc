@@ -1,0 +1,4 @@
+	.text
+	.globl	_fgetwchar
+_fgetwchar:
+	j	fgetwchar

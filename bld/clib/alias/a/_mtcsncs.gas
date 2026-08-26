@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsncset
+_tcsncset:
+	j	_mbsnset

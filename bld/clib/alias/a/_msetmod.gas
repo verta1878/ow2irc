@@ -1,0 +1,4 @@
+	.text
+	.globl	setmode
+setmode:
+	j	_setmode

@@ -1,0 +1,4 @@
+	.text
+	.globl	iscsymf
+iscsymf:
+	b	__iscsymf

@@ -1,0 +1,4 @@
+	.text
+	.globl	bcmp
+bcmp:
+	br	memcmp

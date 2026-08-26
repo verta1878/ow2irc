@@ -1,0 +1,4 @@
+	.text
+	.globl	_getws
+_getws:
+	b	getws

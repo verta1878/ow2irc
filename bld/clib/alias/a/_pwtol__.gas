@@ -1,0 +1,4 @@
+	.text
+	.globl	_watol
+_watol:
+	b	_wtol

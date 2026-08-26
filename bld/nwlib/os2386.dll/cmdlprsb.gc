@@ -1,0 +1,19 @@
+bool OPT_PROCESS_B( OPT_STORAGE_B *data )
+{
+    switch( OPT_GET_LOWER() ) {
+    case 'd':
+	data->d = true;
+	return( false );
+    case 'r':
+	data->r = true;
+	return( false );
+    case 't':
+	data->t = true;
+	return( false );
+    case 'x':
+	data->x = true;
+	return( false );
+    }
+    OPT_UNGET();
+    return( true );
+}

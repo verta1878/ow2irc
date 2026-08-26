@@ -1,0 +1,4 @@
+	.text
+	.globl	_spawnle
+_spawnle:
+	j	spawnle

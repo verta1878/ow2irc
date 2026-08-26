@@ -1,0 +1,4 @@
+	.text
+	.globl	_getpid
+_getpid:
+	b	getpid

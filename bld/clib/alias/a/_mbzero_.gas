@@ -1,0 +1,4 @@
+	.text
+	.globl	bzero
+bzero:
+	j	memset

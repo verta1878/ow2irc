@@ -1,0 +1,4 @@
+	.text
+	.globl	filelength
+filelength:
+	j	_filelength

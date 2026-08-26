@@ -1,0 +1,89 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+#define FESegID (FEFuncTable->FESegID)
+#define FEBack (FEFuncTable->FEBack)
+#define FEAttr (FEFuncTable->FEAttr)
+#define FEAuxInfo (FEFuncTable->FEAuxInfo)
+#define FEName (FEFuncTable->FEName)
+#define FEModuleName (FEFuncTable->FEModuleName)
+#define FEMessage (FEFuncTable->FEMessage)
+#define FEMoreMem (FEFuncTable->FEMoreMem)
+#define FETrue (FEFuncTable->FETrue)
+#define FEGenProc (FEFuncTable->FEGenProc)
+#define FELexLevel (FEFuncTable->FELexLevel)
+#define FEDbgType (FEFuncTable->FEDbgType)
+#define FEDbgRetType (FEFuncTable->FEDbgRetType)
+#define FEStackChk (FEFuncTable->FEStackChk)
+#define FEGetEnv (FEFuncTable->FEGetEnv)
+#define FEExtName (FEFuncTable->FEExtName)
+#define FEParmType (FEFuncTable->FEParmType)
+
+
+
+

@@ -1,0 +1,27 @@
+debug dwarf op nored op symfile op map, statics sys dos   opt stack=8k opt statics sort
+file macros.obj
+file main.obj
+file mautodep.obj
+file mautoomf.obj
+file mcache.obj
+file memory.obj
+file mexec.obj
+file mglob.obj
+file mhash.obj
+file misc.obj
+file mlex.obj
+file mlexmac.obj
+file mlexprs.obj
+file mparse.obj
+file mpreproc.obj
+file mrcmsg.obj
+file msg.obj
+file mstream.obj
+file msuffix.obj
+file msysdep.obj
+file mtarget.obj
+file mupdate.obj
+file mvecstr.obj
+file depinfo.obj
+file mautores.obj
+library ../../../bld/wres/dosi86/mm/wres.lib

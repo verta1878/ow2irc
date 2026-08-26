@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcstok
+_tcstok:
+	br	_mbstok

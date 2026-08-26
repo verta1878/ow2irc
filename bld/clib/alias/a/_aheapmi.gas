@@ -1,0 +1,4 @@
+	.text
+	.globl	_heapmin
+_heapmin:
+	br	_heapshrink

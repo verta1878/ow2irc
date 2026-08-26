@@ -1,0 +1,4 @@
+	.text
+	.globl	_fcvt
+_fcvt:
+	j	fcvt

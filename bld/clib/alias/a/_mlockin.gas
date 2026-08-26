@@ -1,0 +1,4 @@
+	.text
+	.globl	_locking
+_locking:
+	j	locking

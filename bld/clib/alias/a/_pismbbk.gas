@@ -1,0 +1,4 @@
+	.text
+	.globl	_ismbbkalnum
+_ismbbkalnum:
+	b	_ismbbkalpha

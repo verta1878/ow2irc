@@ -1,0 +1,4 @@
+	.text
+	.globl	_tzset
+_tzset:
+	j	tzset

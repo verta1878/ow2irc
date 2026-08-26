@@ -1,0 +1,4 @@
+	.text
+	.globl	_nheapmin
+_nheapmin:
+	j	_nheapshrink

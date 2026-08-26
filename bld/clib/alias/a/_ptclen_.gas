@@ -1,0 +1,4 @@
+	.text
+	.globl	_tclen
+_tclen:
+	b	_mbclen

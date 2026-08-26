@@ -1,0 +1,27 @@
+debug dwarf op nored op symfile op map, statics sys nt   
+file asexpr.obj
+file asopernd.obj
+file asutils.obj
+file asregs.obj
+file assymbol.obj
+file asdrectv.obj
+file asdirop.obj
+file asnumlab.obj
+file ashash.obj
+file asmsg.obj
+file ppcfmt.obj
+file ppcins.obj
+file asmem.obj
+file cmdlnprs.obj
+file cmdscan.obj
+file main.obj
+file obj.obj
+file sections.obj
+file options.obj
+file ppenv.obj
+file preproc.obj
+file ppfmttm.obj
+file ppexpr.obj
+file ppmacro.obj
+file pathlist.obj
+library ../../../../bld/owl/nt386/owl.lib

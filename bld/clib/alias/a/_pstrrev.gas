@@ -1,0 +1,4 @@
+	.text
+	.globl	strrev
+strrev:
+	b	_strrev

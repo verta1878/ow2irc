@@ -1,0 +1,4 @@
+	.text
+	.globl	_i64toa
+_i64toa:
+	b	lltoa

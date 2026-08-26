@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsstr
+_tcsstr:
+	j	_mbsstr

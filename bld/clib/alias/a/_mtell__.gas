@@ -1,0 +1,4 @@
+	.text
+	.globl	tell
+tell:
+	j	_tell

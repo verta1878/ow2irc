@@ -1,0 +1,4 @@
+	.text
+	.globl	index
+index:
+	br	strchr

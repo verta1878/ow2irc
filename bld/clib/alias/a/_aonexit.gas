@@ -1,0 +1,4 @@
+	.text
+	.globl	onexit
+onexit:
+	br	_onexit

@@ -1,0 +1,7 @@
+debug dwarf op nored op symfile op map, statics sys os2 pmc op stack=8k  
+file fileio.obj
+file keyword.obj
+file mem.obj
+file ms2wlink.obj
+file parsems.obj
+file utils.obj

@@ -1,0 +1,4 @@
+	.text
+	.globl	iscsym
+iscsym:
+	br	__iscsym

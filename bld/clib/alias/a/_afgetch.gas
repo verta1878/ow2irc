@@ -1,0 +1,4 @@
+	.text
+	.globl	_fgetchar
+_fgetchar:
+	br	fgetchar

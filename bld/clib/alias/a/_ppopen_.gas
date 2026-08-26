@@ -1,0 +1,4 @@
+	.text
+	.globl	_popen
+_popen:
+	b	popen

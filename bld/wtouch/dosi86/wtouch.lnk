@@ -1,0 +1,5 @@
+debug dwarf op nored op symfile op map, statics sys dos  opt stack=4k  
+file touch.obj
+file dtparse.obj
+file wtmsg.obj
+library ../../../bld/wres/dosi86/ml/wres.lib

@@ -1,0 +1,4 @@
+	.text
+	.globl	_witoa
+_witoa:
+	b	_itow

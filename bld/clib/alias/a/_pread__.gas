@@ -1,0 +1,4 @@
+	.text
+	.globl	_read
+_read:
+	b	read

@@ -1,0 +1,6 @@
+debug dwarf op nored op symfile op map, statics sys os2v2_dll initinstance terminstance op manyautodata  option impfile=mths20.ilb reference __DLLstart_ disable 121 
+file ../../../../../bld/clib/startup/library/os2.386/mf_s/clibdo32.obj
+library ../../../../../bld/mathlib/library/os2.386/mf_s.dll/math3s.lib
+library ../../../../../bld/clib/rtdll/os2.386/mf_s/clbsdll.lib
+export { @../../../../../bld/mathlib/library/os2.386/mf_s.dll/export.gdf }
+export { @../../../../../bld/mathlib/export.386 }

@@ -1,0 +1,4 @@
+	.text
+	.globl	lstat
+lstat:
+	br	stat

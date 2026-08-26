@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsncat
+_tcsncat:
+	b	_mbsnbcat

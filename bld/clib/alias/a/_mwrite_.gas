@@ -1,0 +1,4 @@
+	.text
+	.globl	_write
+_write:
+	j	write

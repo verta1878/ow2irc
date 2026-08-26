@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsninc
+_tcsninc:
+	br	_mbsninc

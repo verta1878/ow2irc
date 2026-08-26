@@ -1,0 +1,4 @@
+	.text
+	.globl	strset
+strset:
+	b	_strset

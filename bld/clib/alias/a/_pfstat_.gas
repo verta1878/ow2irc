@@ -1,0 +1,4 @@
+	.text
+	.globl	_fstat
+_fstat:
+	b	fstat

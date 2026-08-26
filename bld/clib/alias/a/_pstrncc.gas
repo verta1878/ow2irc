@@ -1,0 +1,4 @@
+	.text
+	.globl	strncasecmp
+strncasecmp:
+	b	_strnicmp

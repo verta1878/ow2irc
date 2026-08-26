@@ -1,0 +1,4 @@
+	.text
+	.globl	_strtoui64
+_strtoui64:
+	j	strtoull

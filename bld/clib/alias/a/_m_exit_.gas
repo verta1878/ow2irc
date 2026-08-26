@@ -1,0 +1,4 @@
+	.text
+	.globl	_Exit
+_Exit:
+	j	_exit

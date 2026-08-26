@@ -1,0 +1,4 @@
+	.text
+	.globl	_isatty
+_isatty:
+	j	isatty

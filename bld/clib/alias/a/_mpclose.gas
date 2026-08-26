@@ -1,0 +1,4 @@
+	.text
+	.globl	_pclose
+_pclose:
+	j	pclose

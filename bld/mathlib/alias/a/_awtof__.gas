@@ -1,0 +1,4 @@
+	.text
+	.globl	_watof
+_watof:
+	br	_wtof

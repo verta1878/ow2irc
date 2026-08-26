@@ -1,0 +1,4 @@
+	.text
+	.globl	_putenv
+_putenv:
+	b	putenv

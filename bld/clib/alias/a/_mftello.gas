@@ -1,0 +1,4 @@
+	.text
+	.globl	ftello
+ftello:
+	j	ftell

@@ -1,0 +1,106 @@
+#ifndef A_BIT_SET_DEFINED
+typedef unsigned a_bit_set;
+#define A_BIT_SET_DEFINED
+#endif
+
+#define _GBit_SIZE 128
+
+typedef struct global_bit_set {
+	a_bit_set	_0;
+	a_bit_set	_1;
+	a_bit_set	_2;
+	a_bit_set	_3;
+} global_bit_set;
+
+#define _GBitAssign( dst, src ) { \
+			(dst)._0 = (src)._0; \
+			(dst)._1 = (src)._1; \
+			(dst)._2 = (src)._2; \
+			(dst)._3 = (src)._3; \
+		}
+
+#define _GBitEmpty( set ) ( \
+			(set)._0 == 0 && \
+			(set)._1 == 0 && \
+			(set)._2 == 0 && \
+			(set)._3 == 0  )
+
+#define _GBitSet( dst, a, b, c, d ) { \
+			(dst)._0 = (a_bit_set)a; \
+			(dst)._1 = (a_bit_set)b; \
+			(dst)._2 = (a_bit_set)c; \
+			(dst)._3 = (a_bit_set)d; \
+		}
+
+#define _GBitFirst( set ) _GBitSet( set, 1, 0, 0, 0 )
+
+#define _GBitInit( set, val ) _GBitSet( set, val, val, val, val )
+
+#define _GBitIter( routine, set ) { \
+			(routine)( (set)._0 ); \
+			(routine)( (set)._1 ); \
+			(routine)( (set)._2 ); \
+			(routine)( (set)._3 ); \
+		}
+
+#define _GBitOverlap( a, b ) ( \
+			( (a)._0 & (b)._0 ) || \
+			( (a)._1 & (b)._1 ) || \
+			( (a)._2 & (b)._2 ) || \
+			( (a)._3 & (b)._3 ) )
+
+#define _GBitSame( a, b ) ( \
+			( (a)._0 == (b)._0 ) && \
+			( (a)._1 == (b)._1 ) && \
+			( (a)._2 == (b)._2 ) && \
+			( (a)._3 == (b)._3 ) )
+
+#define _GBitTurnOff( a, b ) { \
+			(a)._0 &= ~(b)._0; \
+			(a)._1 &= ~(b)._1; \
+			(a)._2 &= ~(b)._2; \
+			(a)._3 &= ~(b)._3; \
+		}
+
+#define _GBitIntersect( a, b ) { \
+			(a)._0 &= (b)._0; \
+			(a)._1 &= (b)._1; \
+			(a)._2 &= (b)._2; \
+			(a)._3 &= (b)._3; \
+		}
+
+#define _GBitTurnOn( a, b ) { \
+			(a)._0 |= (b)._0; \
+			(a)._1 |= (b)._1; \
+			(a)._2 |= (b)._2; \
+			(a)._3 |= (b)._3; \
+		}
+
+#define _GBitScalar( a ) ( (a)._0 )
+
+#ifdef _GBit_DEFINE_BITNEXT
+static void _GBitNext( global_bit_set *set ) {
+
+    if( set->_0 & 0x80000000 ) {
+	_GBitSet( *set, 0, 1, 0, 0 );
+    } else {
+	if( set->_1 & 0x80000000 ) {
+	    _GBitSet( *set, 0, 0, 1, 0 );
+	} else {
+	    if( set->_2 & 0x80000000 ) {
+		_GBitSet( *set, 0, 0, 0, 1 );
+	    } else {
+		if( set->_3 & 0x80000000 ) {
+		    _GBitSet( *set, 0, 0, 0, 0 );
+		} else {
+		    (*set)._0 <<= 1;
+		    (*set)._1 <<= 1;
+		    (*set)._2 <<= 1;
+		    (*set)._3 <<= 1;
+		}
+	    }
+	}
+    }
+}
+#endif
+

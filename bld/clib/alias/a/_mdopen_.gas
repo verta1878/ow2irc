@@ -1,0 +1,4 @@
+	.text
+	.globl	_dopen
+_dopen:
+	j	_hdopen

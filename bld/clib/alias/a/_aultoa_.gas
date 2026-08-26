@@ -1,0 +1,4 @@
+	.text
+	.globl	_ultoa
+_ultoa:
+	br	ultoa

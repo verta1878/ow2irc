@@ -1,0 +1,4 @@
+	.text
+	.globl	isleadbyte
+isleadbyte:
+	br	_ismbblead

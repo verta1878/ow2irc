@@ -1,0 +1,4 @@
+	.text
+	.globl	eof
+eof:
+	br	_eof

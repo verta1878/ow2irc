@@ -1,0 +1,5 @@
+ +../../../../bld/graphlib/dos386s/graphi.lib
+ +../../../../bld/graphlib/dos386r/graphi.lib
+ +../../../../bld/graphlib/dos386r/special.lib
+ +../../../../bld/graphlib/pgchart/dos386r/chart.lib
+ +../../../../bld/graphlib/pgchart/dos386s/chart.lib

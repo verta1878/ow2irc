@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsrev
+_tcsrev:
+	b	_mbsrev

@@ -1,0 +1,4 @@
+	.text
+	.globl	_fputchar
+_fputchar:
+	j	fputchar

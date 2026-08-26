@@ -1,0 +1,4 @@
+	.text
+	.globl	_tcsncoll
+_tcsncoll:
+	br	_mbsnbcmp

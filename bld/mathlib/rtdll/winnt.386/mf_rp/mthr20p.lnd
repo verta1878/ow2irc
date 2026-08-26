@@ -1,0 +1,6 @@
+debug dwarf op nored op map, statics sys nt_dll initinstance terminstance  option impfile=mthr20p.ilb reference __DLLstart_ disable 121 
+file ../../../../../bld/clib/startup/library/winnt.386/mf_rp/clibdwnt.obj
+library ../../../../../bld/mathlib/library/winnt.386/mf_rp.dll/math3r.lib
+library ../../../../../bld/clib/rtdll/winnt.386/mf_rp/clbrdllp.lib
+export { @../../../../../bld/mathlib/library/winnt.386/mf_rp.dll/export.gdf }
+export { @../../../../../bld/mathlib/export.386 }
