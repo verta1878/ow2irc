@@ -31,6 +31,14 @@
 
 
 #include "asmglob.h"
+
+/* MASM feature extensions init/fini */
+extern void AsmOptionInit(void);
+extern void AsmOptionFini(void);
+extern void AsmRecordInit(void);
+extern void AsmRecordFini(void);
+extern void AsmInvokeInit(void);
+extern void AsmInvokeFini(void);
 #include <ctype.h>
 #ifdef __WATCOMC__
     #include <process.h>
@@ -383,7 +391,12 @@ static void main_init( void )
     for( i = 0; i < FILE_TYPES; i++ ) {
         AsmFiles.fp[i] = NULL;
         AsmFiles.fname[i] = NULL;
-    }
+    
+    /* MASM feature extensions */
+    AsmOptionInit();
+    AsmRecordInit();
+    AsmInvokeInit();
+}
     AsmFiles.fname[ERR] = MemStrdupSafe( "*" );
     ObjRecInit();
 }
@@ -422,6 +435,11 @@ static void main_fini( void )
     free_names();
     MemFree( SrcFName );
     MemFree( SrcModuleName );
+
+    /* MASM feature extensions */
+    AsmOptionFini();
+    AsmRecordFini();
+    AsmInvokeFini();
 }
 
 static void open_files( void )

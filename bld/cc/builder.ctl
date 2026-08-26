@@ -12,5 +12,6 @@ cdsay .
 [ INCLUDE axp/builder.ctl ]
 [ INCLUDE mps/builder.ctl ]
 [ INCLUDE ppc/builder.ctl ]
+[ INCLUDE x64/builder.ctl ]
 
 cdsay .

@@ -410,6 +410,11 @@ static bool get_id( asm_tok *tok, const char **input, char **output )
     if( tok->class == TC_PATH )
         return( RC_OK );
     ins = get_instruction( tok->string_ptr );
+    /* Check OPTION NOKEYWORD — if this keyword was disabled,
+     * treat it as a plain identifier (TC_ID) instead */
+    if( ins != NULL && IsNoKeyword( tok->string_ptr ) ) {
+        ins = NULL;  /* Demote to identifier */
+    }
     if( ins == NULL ) {
         if( tok->string_ptr[1] == '\0' && tok->string_ptr[0] == '?' ) {
             tok->class = TC_QUESTION_MARK;

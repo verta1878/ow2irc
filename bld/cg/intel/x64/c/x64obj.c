@@ -1141,7 +1141,7 @@ void X64ObjFini( void )
             sym.st_info  = ELF64_ST_INFO(
                 pub_local[q] ? STB_LOCAL : STB_GLOBAL, STT_FUNC);
             SET64(sym.st_value, pub_offs[q]);
-            sym.st_size  = next - pub_offs[q];
+            SET64(sym.st_size, next - pub_offs[q]);
         } else {
             int ps = pub_segs[q];
             int in_bss = ( ps > 0 && ps < 512 && seg_is_bss[ps] );
@@ -1165,7 +1165,7 @@ void X64ObjFini( void )
             sym.st_info  = ELF64_ST_INFO(
                 pub_local[q] ? STB_LOCAL : STB_GLOBAL, STT_OBJECT);
             SET64(sym.st_value, (unsigned int)base + pub_offs[q]);
-            sym.st_size  = ( endoff > pub_offs[q] ) ? endoff - pub_offs[q] : 4;
+            SET64(sym.st_size, ( endoff > pub_offs[q] ) ? endoff - pub_offs[q] : 4);
         }
         fwrite(&sym, 1, sizeof(sym), fp_out);
     }
@@ -1308,7 +1308,7 @@ void X64ObjFini( void )
             if( off >= 0 && off + 4 <= data_seg2_len )
                 memcpy( &within, data_seg2 + off, 4 );
             memset(&drela, 0, sizeof(drela));
-            drela.r_offset = off;
+            SET64(drela.r_offset, off);
             if( dfixups[f].ext_idx >= 0 ) {
                 int e = dfixups[f].ext_idx;
                 int sidx2;
@@ -1320,7 +1320,7 @@ void X64ObjFini( void )
                     sidx2 = 4 + pub_count + rank;
                 }
                 SET64(drela.r_info, ELF64_R_INFO(sidx2, R_X86_64_32));
-                drela.r_addend = within;
+                SET64(drela.r_addend, within);
             } else {
                 int ts = dfixups[f].target_seg;
                 int anchor, base;
@@ -1459,11 +1459,10 @@ void X64ObjFini( void )
     memset(&shdr, 0, sizeof(shdr));
     shdr.sh_name = str_ehframe;
     shdr.sh_type = SHT_PROGBITS;
-      v = SHF_ALLOC;   memcpy(&shdr.sh_flags, &v, 8);
-      v = ehframe_off; memcpy(&shdr.sh_offset, &v, 8);
-      v = eh_pos;      memcpy(&shdr.sh_size, &v, 8);
-      v = 8;           memcpy(&shdr.sh_addralign, &v, 8);
-    }
+    SET64(shdr.sh_flags, SHF_ALLOC);
+    SET64(shdr.sh_offset, ehframe_off);
+    SET64(shdr.sh_size, eh_pos);
+    SET64(shdr.sh_addralign, 8);
     fwrite(&shdr, 1, sizeof(shdr), fp_out);
 
     /* ================================================================
@@ -1474,10 +1473,10 @@ void X64ObjFini( void )
     memset(&shdr, 0, sizeof(shdr));
     shdr.sh_name = str_rodata;
     shdr.sh_type = SHT_PROGBITS;
-      v = SHF_ALLOC;   memcpy(&shdr.sh_flags, &v, 8);
-      v = rodata_off;  memcpy(&shdr.sh_offset, &v, 8);
-      v = rodata_pos;  memcpy(&shdr.sh_size, &v, 8);
-      v = 8;           memcpy(&shdr.sh_addralign, &v, 8);
+    SET64(shdr.sh_flags, SHF_ALLOC);
+    SET64(shdr.sh_offset, rodata_off);
+    SET64(shdr.sh_size, rodata_pos);
+    SET64(shdr.sh_addralign, 8);
     fwrite(&shdr, 1, sizeof(shdr), fp_out);
 
     if( fixup_orig_off ) free( fixup_orig_off );

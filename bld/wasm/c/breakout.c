@@ -44,6 +44,16 @@
 
 /* prototypes */
 
+/* MASM feature extensions (asmoption.c, asmrecord.c, asminvoke.c) */
+extern int AsmOption( token_buffer *tokbuf, int i );
+extern int AsmInvoke( token_buffer *tokbuf, int i );
+extern int AsmProto( token_buffer *tokbuf, int i );
+extern int AsmRecord( token_buffer *tokbuf, int i );
+extern int AsmTypedef( token_buffer *tokbuf, int i );
+extern int AsmUnion( token_buffer *tokbuf, int i );
+extern bool IsNoKeyword( const char *word );
+
+
 bool directive( token_buffer *tokbuf, token_idx i, asm_token direct )
 /********************************************************************
  * Handle all directives
@@ -283,13 +293,22 @@ bool directive( token_buffer *tokbuf, token_idx i, asm_token direct )
     case T_ADDR:
     case T_BOUND:
     case T_CASEMAP:
+    case T_OPTION:
+        return( AsmOption( tokbuf, i ) );
     case T_INVOKE:
+        return( AsmInvoke( tokbuf, i ) );
+    case T_PROTO:
+        return( AsmProto( tokbuf, i ) );
+    case T_HIGHWORD:
+    case T_LOW:
+    case T_LOWWORD:
+    case T_ADDR:
+    case T_BOUND:
+    case T_CASEMAP:
     case T_LROFFSET:
     case T_OPATTR:
-    case T_OPTION:
     case T_POPCONTEXT:
     case T_PUSHCONTEXT:
-    case T_PROTO:
     case T_THIS:
     case T_WIDTH:
         if( Options.mode & MODE_IDEAL ) {
@@ -332,11 +351,14 @@ bool directive( token_buffer *tokbuf, token_idx i, asm_token direct )
             }
         }
         return( RC_OK );
+    case T_RECORD:
+        return( AsmRecord( tokbuf, i ) );
+    case T_TYPEDEF:
+        return( AsmTypedef( tokbuf, i ) );
+    case T_UNION:
+        return( AsmUnion( tokbuf, i ) );
     case T_CATSTR:
     case T_MASK:
-    case T_RECORD:
-    case T_TYPEDEF:
-    case T_UNION:
         AsmError( NOT_SUPPORTED );
         return( RC_ERROR );
     case T_ORG:

@@ -277,6 +277,7 @@ typedef struct field_list {
 typedef struct {
     unsigned            size;       // size in bytes ( including alignment )
     unsigned short      alignment;
+    bool                is_union;   // true for UNION (all fields at offset 0)
     struct {
         field_list      *head;      // head of fields list
         field_list      *tail;      // tail of fields list
