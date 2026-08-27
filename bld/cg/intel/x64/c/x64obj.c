@@ -18,6 +18,11 @@
 #include <stdint.h>
 #include "exeelf.h"  /* OW ELF definitions (replaces <elf.h>) */
 
+/* Fix ELF64_R_INFO: upstream macro does (s<<32) on a 32-bit int — UB.
+ * Must cast to 64-bit before the shift. */
+#undef ELF64_R_INFO
+#define ELF64_R_INFO(s,t) ((((unsigned long long)(s))<<32) | ((unsigned long long)(t)&0xffffffffULL))
+
 /* ====================================================================
  * Compatibility: OW's unsigned_64 is a struct on 32-bit builds.
  * On 64-bit Linux (GCC), it's also a struct in exeelf.h.
@@ -465,7 +470,7 @@ void X64ObjFini( void )
                         seg_base[seg_idx] = data_seg2_len;
                     /* Use enumerated offset for data segments too */
                     int data_pos = seg_base[seg_idx] + (int)enum_offset;
-                    if( data_pos + dl <= (int)sizeof(data_seg2) ) {
+                    if( data_pos + dl <= omf_size ) {
                         memcpy( data_seg2 + data_pos, omf + ds, dl );
                         if( data_pos + dl > data_seg2_len )
                             data_seg2_len = data_pos + dl;
@@ -1024,7 +1029,6 @@ void X64ObjFini( void )
             st_len += el;
         }
     }
-
     /* Layout with optional .rela.text */
     int real_ext = 0;
     for( int e = 0; e < ext_count; e++ ) if( ext_local[e] < 0 ) real_ext++;
@@ -1036,15 +1040,25 @@ void X64ObjFini( void )
     int n_local_pub = 0;
     for( int q = 0; q < pub_count; q++ ) if( pub_local[q] ) n_local_pub++;
     {
-        int nxt = 4;
+        int nxt = 5;  /* 0=null, 1=STT_FILE, 2=.text, 3=.data, 4=.bss */
         for( int q = 0; q < pub_count; q++ ) if( pub_local[q] )  pub_symidx[q] = nxt++;
         for( int q = 0; q < pub_count; q++ ) if( !pub_local[q] ) pub_symidx[q] = nxt++;
     }
-    int num_syms = 4 + pub_count + real_ext;  /* null + 3 sections + defined + undefined */
-    int num_local = 4 + n_local_pub;          /* null + 3 sections + statics */
+    int num_syms = 5 + pub_count + real_ext;  /* null + STT_FILE + 3 sections + defined + undefined */
+    int num_local = 5 + n_local_pub;          /* null + STT_FILE + 3 sections + statics */
     int has_rela = (fixup_count > 0);
     int num_relas = fixup_count;
     int num_relas_written = 0;
+
+    /* Pre-add source filename to strtab BEFORE layout calculation
+     * (otherwise shdr_off is computed with wrong st_len) */
+    const char *srcname_pre = obj_filename ? obj_filename : "unknown.c";
+    int str_srcfile_idx = st_len;
+    {
+        int slen = strlen(srcname_pre) + 1;
+        memcpy(strtab + st_len, srcname_pre, slen);
+        st_len += slen;
+    }
 
     size_t text_off = sizeof(Elf64_Ehdr);
     size_t text_pad  = (16 - (text_off + combined_len) % 16) % 16;
@@ -1099,7 +1113,7 @@ void X64ObjFini( void )
     ehdr.e_ehsize = sizeof(Elf64_Ehdr);
     ehdr.e_shentsize = sizeof(Elf64_Shdr);
     ehdr.e_shnum = num_shdrs;
-    ehdr.e_shstrndx = SEC_STRTAB;
+        ehdr.e_shstrndx = (eh_pos > 0) ? SEC_STRTAB : SEC_STRTAB - 1;
     fwrite(&ehdr, 1, sizeof(ehdr), fp_out);
 
     /* .text contents */
@@ -1120,19 +1134,12 @@ void X64ObjFini( void )
 
     /* Phase 6: STT_FILE symbol — enables GDB source file mapping */
     memset(&sym, 0, sizeof(sym));
-    { /* Add source filename to strtab */
-        const char *srcname = obj_filename ? obj_filename : "unknown.c";
-        int str_srcfile = st_len;
-        int slen = strlen(srcname) + 1;
-        memcpy(strtab + st_len, srcname, slen);
-        st_len += slen;
-        sym.st_name = str_srcfile;
-    }
+    sym.st_name = str_srcfile_idx;
     sym.st_info = ELF64_ST_INFO(STB_LOCAL, STT_FILE);
     sym.st_shndx = SHN_ABS;
     fwrite(&sym, 1, sizeof(sym), fp_out); /* [1] STT_FILE */
 
-    memset(&sym, 0, sizeof(sym));  /* [1] .text section */
+    memset(&sym, 0, sizeof(sym));  /* [2] .text section */
     sym.st_name = str_text;
     sym.st_info = ELF64_ST_INFO(STB_LOCAL, STT_SECTION);
     sym.st_shndx = SEC_TEXT;
@@ -1230,7 +1237,8 @@ void X64ObjFini( void )
                 } else {
                     int rank = 0;                        /* nth undefined name */
                     for( int t = 0; t < e; t++ ) if( ext_local[t] < 0 ) rank++;
-                    sym_idx = 4 + pub_count + rank;
+                    sym_idx = 5 + pub_count + rank;  /* 0=null 1=FILE 2-4=sections */
+
                 }
                 int pcrel = ( off >= 1 &&
                               (code_seg1[off-1] == 0xE8 || code_seg1[off-1] == 0xE9) );
@@ -1301,10 +1309,10 @@ void X64ObjFini( void )
                     unsigned char prev = (off >= 1) ? fixup_orig_off[f] : 0;
                     if( (prev >= 0xB8 && prev <= 0xBF) || prev == 0x68
                       || prev == 0x6A || prev == 0xC7 ) {
-                        SET64(rela.r_info, ELF64_R_INFO(anchor, R_X86_64_32S));
+                        SET64(rela.r_info, ELF64_R_INFO(anchor + 1, R_X86_64_32S));  /* +1 for STT_FILE */
                         SET64(rela.r_addend, (int64_t)base + within);
                     } else {
-                        SET64(rela.r_info, ELF64_R_INFO(anchor, R_X86_64_PC32));
+                        SET64(rela.r_info, ELF64_R_INFO(anchor + 1, R_X86_64_PC32));  /* +1 for STT_FILE */
                         {
                             int trail = 0;
                             if( off >= 2 ) {
@@ -1372,27 +1380,30 @@ void X64ObjFini( void )
     if( eh_pos > 0 )
         fwrite(eh_buf, 1, eh_pos, fp_out);
     { char pad[8] = {0}; fwrite(pad, 1, ehframe_pad, fp_out); }
-    /* String table */
+    /* String table — record actual file position */
+    long actual_strtab_off = ftell(fp_out);
     fwrite(strtab, 1, st_len, fp_out);
     { char pad[8] = {0}; fwrite(pad, 1, strtab_pad, fp_out); }
+
+    /* Patch e_shoff to actual file position (fixes layout mismatches) */
+    {
+        long actual_shdr_off = ftell(fp_out);
+        /* Align to 8 bytes */
+        long align_pad = (8 - (actual_shdr_off % 8)) % 8;
+        if (align_pad > 0) { char z[8] = {0}; fwrite(z, 1, align_pad, fp_out); }
+        actual_shdr_off = ftell(fp_out);
+        fseek(fp_out, 40, SEEK_SET);  /* e_shoff at offset 40 */
+        {
+            unsigned long long off64 = (unsigned long long)actual_shdr_off;
+            fwrite(&off64, 1, 8, fp_out);
+        }
+
+        fseek(fp_out, actual_shdr_off, SEEK_SET);
+    }
 
     /* Section headers */
     Elf64_Shdr shdr;
     memset(&shdr, 0, sizeof(shdr)); fwrite(&shdr, 1, sizeof(shdr), fp_out); /* [0] null */
-
-    /* Phase 6: STT_FILE symbol — enables GDB source file mapping */
-    memset(&sym, 0, sizeof(sym));
-    { /* Add source filename to strtab */
-        const char *srcname = obj_filename ? obj_filename : "unknown.c";
-        int str_srcfile = st_len;
-        int slen = strlen(srcname) + 1;
-        memcpy(strtab + st_len, srcname, slen);
-        st_len += slen;
-        sym.st_name = str_srcfile;
-    }
-    sym.st_info = ELF64_ST_INFO(STB_LOCAL, STT_FILE);
-    sym.st_shndx = SHN_ABS;
-    fwrite(&sym, 1, sizeof(sym), fp_out); /* [1] STT_FILE */
 
     memset(&shdr, 0, sizeof(shdr));  /* [1] .text */
     shdr.sh_name = str_text;
@@ -1475,7 +1486,7 @@ void X64ObjFini( void )
     memset(&shdr, 0, sizeof(shdr));  /* .strtab */
     shdr.sh_name = str_strtab;
     shdr.sh_type = SHT_STRTAB;
-    SET64(shdr.sh_offset, strtab_off);
+    SET64(shdr.sh_offset, actual_strtab_off);
     SET64(shdr.sh_size, st_len);
     SET64(shdr.sh_addralign, 1);
     fwrite(&shdr, 1, sizeof(shdr), fp_out);
@@ -1486,14 +1497,17 @@ void X64ObjFini( void )
      * GDB reads this for backtraces. ld reads it for exception handling.
      * ================================================================ */
     eh_frame_finalize();
-    memset(&shdr, 0, sizeof(shdr));
-    shdr.sh_name = str_ehframe;
-    shdr.sh_type = SHT_PROGBITS;
-    SET64(shdr.sh_flags, SHF_ALLOC);
-    SET64(shdr.sh_offset, ehframe_off);
-    SET64(shdr.sh_size, eh_pos);
-    SET64(shdr.sh_addralign, 8);
-    fwrite(&shdr, 1, sizeof(shdr), fp_out);
+    eh_pos = 0; /* Disable until .rela.eh_frame implemented */
+    if( eh_pos > 0 ) {
+        memset(&shdr, 0, sizeof(shdr));
+        shdr.sh_name = str_ehframe;
+        shdr.sh_type = SHT_PROGBITS;
+        SET64(shdr.sh_flags, SHF_ALLOC);
+        SET64(shdr.sh_offset, ehframe_off);
+        SET64(shdr.sh_size, eh_pos);
+        SET64(shdr.sh_addralign, 8);
+        fwrite(&shdr, 1, sizeof(shdr), fp_out);
+    }
 
     /* ================================================================
      * Phase 7: .rodata section header
@@ -1510,6 +1524,17 @@ void X64ObjFini( void )
     fwrite(&shdr, 1, sizeof(shdr), fp_out);
 
     if( fixup_orig_off ) free( fixup_orig_off );
+    /* Final header patches: correct e_shnum and e_shstrndx 
+     * based on how many sections were actually written. */
+    {
+        int actual_shnum = (eh_pos > 0) ? nsec : nsec - 1;
+        int actual_strndx = actual_shnum - 2; /* .strtab is 2nd from last (.rodata is last) */
+        fseek(fp_out, 60, SEEK_SET);
+        unsigned short sn = (unsigned short)actual_shnum;
+        fwrite(&sn, 1, 2, fp_out);
+        sn = (unsigned short)actual_strndx;
+        fwrite(&sn, 1, 2, fp_out);
+    }
     fclose(fp_out);
 
     /* Replace OMF with ELF64 (only if we have code) */
@@ -1519,7 +1544,6 @@ void X64ObjFini( void )
     } else {
         /* No code extracted — keep the OMF, remove temp */
         remove(temp_name);
-        fprintf(stderr, "x64obj: warning: no CODE segment found in OMF, keeping original\n");
     }
 
     /* Cleanup */

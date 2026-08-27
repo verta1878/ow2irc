@@ -84,12 +84,56 @@ fi
 # === OW2IRC: bwccx64 post-build ===
 if [ -d "$OWROOT/bld/cc/x64" ]; then
   echo "=== Building bwccx64 ==="
-  # Copy ALL 386 CC objects to x64 (overwrite inline asm with non-_STANDALONE_ versions)
-  cp -f "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null 2>/dev/null
+  # Copy ALL 386 CC objects to x64
+  cp -f "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
+  # Recompile x64-specific files with _TARG_X64 (enables OMF→ELF64 conversion)
+  X64FLAGS="-w -I$OWROOT/bld/cc/x64/binbuild -I$OWROOT/bld/cc/h -I$OWROOT/bld/cc/x64 \
+    -I$OWROOT/bld/cg/h -I$OWROOT/bld/cg/intel/h -I$OWROOT/bld/cg/intel/386/h \
+    -I$OWROOT/bld/cg/intel/x64/h -I$OWROOT/bld/watcom/h -I$OWROOT/bld/dwarf/dw/h \
+    -I$OWROOT/bld/wasm/h -I$OWROOT/bld/fe_misc/h -I$OWROOT/bld/owl/h \
+    -I$OWROOT/bld/comp_cfg/h -I$OWROOT/bld/as/h \
+    -D_CPU=386 -D_TARG_X64=1 -DBOOTSTRAP -D__UNIX__ -D__LINUX__"
+  gcc -c $X64FLAGS "$OWROOT/bld/cc/c/cgen.c" -o "$OWROOT/bld/cc/x64/binbuild/cgen.obj" 2>/dev/null
+  gcc -c $X64FLAGS "$OWROOT/bld/cc/c/cmdlnx86.c" -o "$OWROOT/bld/cc/x64/binbuild/cmdlnx86.obj" 2>/dev/null
+  # Recompile x64obj.c with all ELF writer fixes:
+  gcc -c -w -I"$OWROOT/bld/cg/intel/x64/binbuild" \
+    -I"$OWROOT/bld/cg/h" -I"$OWROOT/bld/cg/intel/h" -I"$OWROOT/bld/cg/intel/386/h" \
+    -I"$OWROOT/bld/cg/intel/x64/h" -I"$OWROOT/bld/watcom/h" -I"$OWROOT/bld/dwarf/dw/h" \
+    -I"$OWROOT/bld/owl/h" -I"$OWROOT/bld/comp_cfg/h" -I"$OWROOT/bld/cfloat/h" \
+    -D_CPU=386 -D_TARG_X64=1 -DBOOTSTRAP -D__UNIX__ -D__LINUX__ \
+    "$OWROOT/bld/cg/intel/x64/c/x64obj.c" -o "$OWROOT/bld/cg/intel/x64/binbuild/x64obj.obj" 2>/dev/null
+  # Rebuild CG library with fixed x64obj:
+  cd "$OWROOT/bld/cg/intel/x64/binbuild"
+  ar rcs cgx64.lib *.obj 2>/dev/null
+  cp cgx64.lib cgx64lnx.lib 2>/dev/null
+  cd "$OWROOT"  2>/dev/null
   cp -n "$OWROOT/bld/cc/386/binbuild/"*.gh  "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
   cp -n "$OWROOT/bld/cc/386/binbuild/"*.grh "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
   cd "$OWROOT/bld/cc/x64"
   make -s OWROOT="$OWROOT" asm_objs link 2>&1 || true
+  cd "$OWROOT"
+fi
+
+# === OW2IRC: bwpp386 build (if not built by builder) ===
+if [ ! -f "$OWROOT/build/binbuild/bwpp386" ] && [ -d "$OWROOT/bld/plusplus/386" ]; then
+  echo "=== Building bwpp386 ==="
+  # Copy CC/386 objects as base (plusplus shares most CC code)
+  mkdir -p "$OWROOT/bld/plusplus/386/binbuild"
+  cp -n "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/plusplus/386/binbuild/" 2>/dev/null
+  cp -n "$OWROOT/bld/cc/386/binbuild/"*.gh  "$OWROOT/bld/plusplus/386/binbuild/" 2>/dev/null
+  cp -n "$OWROOT/bld/cc/386/binbuild/"*.grh "$OWROOT/bld/plusplus/386/binbuild/" 2>/dev/null
+  cd "$OWROOT/bld/plusplus/386/binbuild"
+  gcc -o bwpp386 *.obj \
+    "$OWROOT/bld/cg/intel/386/binbuild/cg386.lib" \
+    "$OWROOT/bld/cg/intel/386/binbuild/cg386lnx.lib" \
+    "$OWROOT/bld/watcom/binbuild/clibext.lib" \
+    "$OWROOT/bld/dwarf/dw/binbuild/dwarfw.lib" \
+    "$OWROOT/bld/cfloat/binbuild/cf.lib" \
+    -lm -no-pie 2>/dev/null && {
+      chmod +x bwpp386
+      cp bwpp386 "$OWROOT/build/binbuild/"
+      echo "=== bwpp386 linked ==="
+    } || true
   cd "$OWROOT"
 fi
 

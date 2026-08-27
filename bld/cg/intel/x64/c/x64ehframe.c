@@ -115,38 +115,28 @@ void eh_frame_init(void)
     eh_current_fde = -1;
     eh_last_code_offset = 0;
 
-    /* Emit CIE */
+    /* Emit CIE — minimal, no augmentation */
     eh_cie_offset = eh_pos;
     int cie_start = eh_pos;
 
     eh_emit_u32(0);         /* length placeholder */
     eh_emit_u32(0);         /* CIE ID = 0 */
     eh_emit_byte(1);        /* version */
-
-    /* Augmentation string "zR\0" — sized + PC-relative FDE encoding */
-    eh_emit_byte('z');
-    eh_emit_byte('R');
-    eh_emit_byte(0);
+    eh_emit_byte(0);        /* augmentation string: empty (no zR) */
 
     eh_emit_uleb128(1);     /* code_alignment_factor */
     eh_emit_sleb128(-8);    /* data_alignment_factor */
     eh_emit_uleb128(16);    /* return_address_register (RA) */
 
-    /* Augmentation data */
-    eh_emit_uleb128(1);     /* augmentation data length */
-    eh_emit_byte(0x1B);     /* DW_EH_PE_pcrel | DW_EH_PE_sdata4 */
-
     /* Initial instructions */
-    /* DW_CFA_def_cfa RSP(7), 8 */
     eh_emit_byte(DW_CFA_def_cfa);
     eh_emit_uleb128(DWARF_RSP);
     eh_emit_uleb128(8);
 
-    /* DW_CFA_offset RA(16), 1 → saved at CFA - 8 */
     eh_emit_byte(DW_CFA_offset | DWARF_RA);
-    eh_emit_uleb128(1);     /* 1 * |data_alignment| = 8 bytes from CFA */
+    eh_emit_uleb128(1);
 
-    /* Pad to 8-byte alignment */
+    /* Pad to pointer-size alignment */
     while ((eh_pos - cie_start) % 8 != 0) {
         eh_emit_byte(DW_CFA_nop);
     }
@@ -175,14 +165,11 @@ void eh_frame_begin_function(const char *name, uint64_t addr, uint64_t size)
     uint32_t cie_delta = eh_pos - eh_cie_offset;
     eh_emit_u32(cie_delta);
 
-    /* PC begin (will be relocated) */
-    eh_emit_u32((uint32_t)addr);    /* sdata4, PC-relative */
+    /* PC begin (absolute 4-byte, no augmentation) */
+    eh_emit_u32((uint32_t)addr);
 
     /* PC range */
     eh_emit_u32((uint32_t)size);
-
-    /* Augmentation data length (0 for basic FDE) */
-    eh_emit_uleb128(0);
 }
 
 /* ====================================================================

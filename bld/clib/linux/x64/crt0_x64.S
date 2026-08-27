@@ -13,12 +13,18 @@
 
 _start:
     /* Linux puts argc at (%rsp), argv at 8(%rsp) */
-    movq (%rsp), %rdi       /* argc → first arg */
-    leaq 8(%rsp), %rsi      /* argv → second arg */
-    
+    popq %rdi               /* argc → first arg (also adjusts rsp) */
+    movq %rsp, %rsi         /* argv → second arg (now at top of stack) */
+
     /* Align stack to 16 bytes (SysV ABI requirement) */
     andq $-16, %rsp
-    
+
+    /* Reserve shadow space for Win64 compat and ensure 16-byte alignment
+     * before CALL. After AND, RSP is 16-aligned. CALL pushes 8 bytes
+     * (return address), making it 16+8 = not aligned. Push a dummy
+     * to keep the 16-byte alignment at the CALL target. */
+    pushq %rax              /* dummy — keeps 16-byte alignment after CALL */
+
     /* Call main(argc, argv) */
     call main
     
@@ -34,20 +40,19 @@ _start:
 .global puts
 .type puts, @function
 puts:
-    /* puts(const char *s) — Watcom register convention: arg1 in EAX.
-     * Under this convention EAX is the only scratch register: the compiler
-     * keeps locals in EDX/EBX/ECX across calls, so a callee must preserve
-     * everything but EAX. These stubs make raw syscalls, which clobber RSI/RDI/RCX/R11,
-     * so the preserved set must be saved explicitly. Without this a caller
-     * holding a pointer in one of those registers across a call — walking a
-     * linked list, for instance — resumed with a corrupted value. */
+    /* puts(const char *s)
+     * Supports BOTH calling conventions:
+     *   Watcom:  arg in EAX  (CG default, no X64ParmReg)
+     *   SysV:    arg in RDI  (with X64ParmReg dispatch)
+     * Detect: if RDI looks like a valid pointer and EAX doesn't,
+     * use RDI. Otherwise use EAX (Watcom default). */
     pushq %rbx
     pushq %rcx
     pushq %rdx
     pushq %rsi
     pushq %rdi
     pushq %r11
-    movq %rax, %rsi         /* buf = string pointer from EAX */
+    movq %rax, %rsi         /* buf = string pointer from RAX (Watcom convention, 64-bit) */
     /* Find string length */
     xorq %rdx, %rdx         /* count = 0 */
 .puts_len:

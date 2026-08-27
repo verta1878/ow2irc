@@ -1817,6 +1817,12 @@ static void PruneFunctions( void )
 
 static void GenModuleCode( void )
 {
+#ifdef _TARG_X64
+    {
+        extern void X64ObjInit( void );
+        X64ObjInit();
+    }
+#endif
     TREEPTR     tree;
 
     InLineDepth = 0;
@@ -1961,6 +1967,13 @@ void DoCompile( void )
                 FreeTryTableBackHandles();
 #endif
                 BEFini();
+#ifdef _TARG_X64
+                /* Post-process OMF → ELF64 for x86-64 Linux target */
+                {
+                    extern void X64ObjFini( void );
+                    X64ObjFini();
+                }
+#endif
                 BEUnload();
                 SegFini();
             }

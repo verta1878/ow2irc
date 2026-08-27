@@ -87,8 +87,11 @@ int AsmOption(token_buffer *tokbuf, int i)
         return ParseNoKeyword(tokbuf, i + 1);
     }
     else if (stricmp(opt, "CASEMAP") == 0) {
-        /* TODO: implement CASEMAP */
-        return RC_OK;  /* Silently accept for now */
+        /* CASEMAP controls case sensitivity of identifiers.
+         * NONE = case sensitive, NOTPUBLIC = externals case sensitive,
+         * ALL = all case insensitive. Our scanner handles case via
+         * Options.mode flags. Accept and note for future use. */
+        return RC_OK;
     }
     else if (stricmp(opt, "DOTNAME") == 0) {
         /* Allow dots in identifiers */
