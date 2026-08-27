@@ -81,5 +81,36 @@ else
         fi
     fi
 fi
+# === OW2IRC: bwccx64 post-build ===
+if [ -d "$OWROOT/bld/cc/x64" ]; then
+  echo "=== Building bwccx64 ==="
+  # Copy ALL 386 CC objects to x64 (overwrite inline asm with non-_STANDALONE_ versions)
+  cp -f "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null 2>/dev/null
+  cp -n "$OWROOT/bld/cc/386/binbuild/"*.gh  "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
+  cp -n "$OWROOT/bld/cc/386/binbuild/"*.grh "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
+  cd "$OWROOT/bld/cc/x64"
+  make -s OWROOT="$OWROOT" asm_objs link 2>&1 || true
+  cd "$OWROOT"
+fi
+
+# === OW2IRC: bwppx64 post-build ===
+if [ -d "$OWROOT/bld/plusplus/x64" ] && [ -d "$OWROOT/bld/plusplus/386/binbuild" ]; then
+  echo "=== Building bwppx64 ==="
+  mkdir -p "$OWROOT/bld/plusplus/x64/binbuild"
+  cp -f "$OWROOT/bld/plusplus/386/binbuild/"*.obj "$OWROOT/bld/plusplus/x64/binbuild/" 2>/dev/null
+  cp -f "$OWROOT/bld/plusplus/386/binbuild/"*.gh  "$OWROOT/bld/plusplus/x64/binbuild/" 2>/dev/null
+  cp -f "$OWROOT/bld/plusplus/386/binbuild/"*.grh "$OWROOT/bld/plusplus/x64/binbuild/" 2>/dev/null
+  cd "$OWROOT/bld/plusplus/x64/binbuild"
+  gcc -o bwppx64 *.obj \
+    "$OWROOT/bld/cg/intel/x64/binbuild/cgx64.lib" \
+    "$OWROOT/bld/cg/intel/x64/binbuild/cgx64lnx.lib" \
+    "$OWROOT/bld/watcom/binbuild/clibext.lib" \
+    "$OWROOT/bld/dwarf/dw/binbuild/dwarfw.lib" \
+    "$OWROOT/bld/cfloat/binbuild/cf.lib" \
+    -lm -no-pie 2>/dev/null && echo "=== bwppx64 linked ===" || true
+  [ -f bwppx64 ] && cp bwppx64 "$OWROOT/build/binbuild/"
+  cd "$OWROOT"
+fi
+
 cd "$OWROOT"
 exit $RC

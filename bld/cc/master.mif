@@ -1,5 +1,8 @@
 tree_depth = 4
 
+# Include directory definitions (wasm_dir, dwarfw_dir, etc.)
+!include cdirs.mif
+
 proj_name = cc
 
 cc_autodepends = .AUTODEPEND
@@ -61,7 +64,7 @@ additional_remove_subdirs = $(bin_subdir)
 #
 .c: ../../c;$(cli_asminline_c);$(fe_misc_dir)/c;$(watcom_dir)/c
 
-inc_dirs  = -I. -I.. -I"../../h" $(cli_cg_inc_dirs) $(cli_asminline_inc_dirs) $(cli_owl_inc_dirs) $(cli_dwarfw_inc_dirs) -I"$(comp_cfg_dir)/h" -I"$(fe_misc_dir)/h" -I"../../../wasm/h"
+inc_dirs  = -I. -I.. -I"../../h" $(cli_cg_inc_dirs) $(cli_asminline_inc_dirs) $(cli_owl_inc_dirs) $(cli_dwarfw_inc_dirs) -I"$(comp_cfg_dir)/h" -I"$(fe_misc_dir)/h" -I"../../../wasm/h" -I"$(as_dir)/h"
 
 extra_cpp_flags_target_axp = -DAS_ALPHA
 extra_cpp_flags_target_mps = -DAS_MIPS
@@ -183,7 +186,7 @@ code$(target_cpu).gh : ./mkcode.exe xcode$(target_cpu).tmp
 target_as_axp   = bwasaxp -zq -w8
 target_as_i86   = bwasm -zq -w8-cx
 target_as_386   = bwasm -zq -w8-cx -3
-target_as_x64   = bwasm -zq -w8-cx -3
+target_as_x64   = bwasm -zq -w8-cx -3 -i=$(%OWROOT)/bld/watcom/h
 target_as_ppc   = bwasppc -zq -w8
 target_as_mps   = bwasmps -zq -w8
 

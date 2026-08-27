@@ -425,21 +425,51 @@ void X64ObjFini( void )
         if( rt == OMF_LEDATA32 || rt == OMF_LEDATA ) {
             int seg_idx = omf[i+3];
             int ds, dl;
-            if( rt == OMF_LEDATA32 )
-                ds = i + 3 + 1 + 4;
-            else
-                ds = i + 3 + 1 + 2;
-            if( seg_idx & 0x80 ) { seg_idx = ((seg_idx & 0x7F) << 8) | omf[i+4]; ds++; }
+            unsigned long enum_offset;  /* enumerated data offset */
+            int idx_end;
+            if( seg_idx & 0x80 ) {
+                seg_idx = ((seg_idx & 0x7F) << 8) | omf[i+4];
+                idx_end = i + 3 + 2;
+            } else {
+                idx_end = i + 3 + 1;
+            }
+            /* Read enumerated data offset (position within segment) */
+            if( rt == OMF_LEDATA32 ) {
+                enum_offset = (unsigned long)omf[idx_end]
+                    | ((unsigned long)omf[idx_end+1] << 8)
+                    | ((unsigned long)omf[idx_end+2] << 16)
+                    | ((unsigned long)omf[idx_end+3] << 24);
+                ds = idx_end + 4;
+            } else {
+                enum_offset = (unsigned long)omf[idx_end]
+                    | ((unsigned long)omf[idx_end+1] << 8);
+                ds = idx_end + 2;
+            }
             dl = rec_len - (ds - (i+3)) - 1;
             if( dl > 0 && ds + dl <= omf_size ) {
                 if( seg_idx == text_seg_idx ) {
-                    memcpy( code_seg1 + code_seg1_len, omf + ds, dl );
-                    code_seg1_len += dl;
+                    /* Use enumerated offset to position data correctly.
+                     * If offset > current length, zero-fill the gap.
+                     * If offset == current length, append (common case). */
+                    if( (int)enum_offset > code_seg1_len ) {
+                        memset( code_seg1 + code_seg1_len, 0, enum_offset - code_seg1_len );
+                        code_seg1_len = (int)enum_offset;
+                    }
+                    if( (int)enum_offset <= code_seg1_len ) {
+                        memcpy( code_seg1 + enum_offset, omf + ds, dl );
+                        if( (int)enum_offset + dl > code_seg1_len )
+                            code_seg1_len = (int)enum_offset + dl;
+                    }
                 } else if( seg_idx > 0 && seg_idx < 512 && seg_is_data[seg_idx] ) {
                     if( seg_base[seg_idx] < 0 )
                         seg_base[seg_idx] = data_seg2_len;
-                    memcpy( data_seg2 + data_seg2_len, omf + ds, dl );
-                    data_seg2_len += dl;
+                    /* Use enumerated offset for data segments too */
+                    int data_pos = seg_base[seg_idx] + (int)enum_offset;
+                    if( data_pos + dl <= (int)sizeof(data_seg2) ) {
+                        memcpy( data_seg2 + data_pos, omf + ds, dl );
+                        if( data_pos + dl > data_seg2_len )
+                            data_seg2_len = data_pos + dl;
+                    }
                 }
             }
         }

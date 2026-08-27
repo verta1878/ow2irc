@@ -1,22 +1,15 @@
-# wpp64 Builder Control file — x86-64 C++ Compiler
-# ==================================================
-# Links the C++ front-end (plusplus) with the x64 CG back-end.
-# Produces bwpp64 — the x86-64 C++ compiler.
-#
-# NOT YET BUILT — needs:
-#   1. Itanium name mangling (or use OW mangling + -bt=linux64)
-#   2. DWARF exception table generation
-#   3. vtable layout verification with 8-byte pointers
-#
-# When ready, add to bld/plusplus/builder.ctl:
-#   [ INCLUDE x64/builder.ctl ]
-#
-# GPLv3 — the crew 4free — sysop/0
-
+# wpp64 Builder Control file
+set PROJNAME=wpp64
+set BINTOOL=0
 set PROJDIR=<CWD>
-[ INCLUDE "<OWROOT>/build/master.ctl" ]
-cdsay .
-
-# TODO: Build wpp64 when CG x64 is fully integrated
-# [ BLOCK <BLDRULE> build rel ]
-# ...
+[ INCLUDE "<OWROOT>/build/prolog.ctl" ]
+[ INCLUDE "<OWROOT>/build/defrule.ctl" ]
+[ BLOCK <BLDRULE> rel ]
+    cdsay "<PROJDIR>"
+[ BLOCK <BINTOOL> build ]
+    cdsay "<PROJDIR>"
+    <CPCMD> <OWOBJDIR>/bwppx64.exe "<OWROOT>/build/<OWOBJDIR>/bwppx64<CMDEXT>"
+[ BLOCK <BINTOOL> clean ]
+    rm -f "<OWROOT>/build/<OWOBJDIR>/bwppx64<CMDEXT>"
+[ BLOCK . . ]
+[ INCLUDE "<OWROOT>/build/epilog.ctl" ]

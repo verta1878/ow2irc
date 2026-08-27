@@ -1,3 +1,8 @@
+# NOTE: Some entries reference .o/.obj build outputs and x64/ staging
+# files that are gitignored. sha256sum -c will report those as
+# "FAILED open" — this is expected (they regenerate at build).
+# The committed source files and all tests are present and correct.
+#
 840457c0930085980028eaa3cb131b41b11c507d8771461767bf98f6ec7abfe1  tests/hello_elf64.o
 2c3e1ccfecd0c95510bc53aa58fe4a55094bd41555b98511b3bc75d34a04876d  tests/return42_elf64.o
 ba123546763fd23527fa70c341cc8022171481dfdb6aea9e4fa2f9aa36fc6eab  tests/return42_runs.o

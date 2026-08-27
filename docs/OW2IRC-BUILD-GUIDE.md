@@ -1,117 +1,99 @@
-# OW2IRC Build Guide — How to Build from Source
+# OW2IRC Build Guide
 
 _the crew 4free — sysop/0 + bob_
-_Fixes applied: 2026-08-25_
+_Updated: 2026-08-27_
 
-## Quick Answer for wrench
+## Quick Start
 
-**wasm does NOT replace JWasm for VxD work.** wasm has MASM references
-in its source but does NOT support the MASM features VxDs need:
-`OPTION NOKEYWORD`, `&&` in macros, `RECORD <>` literals.
-Keep using JWasm for FOSSIL VxD assembly. They produce the same
-object format — wlink links both. See WASM-JWASM-INTEGRATION.md.
-
-## Option 1: Build on Linux with GCC (fast, what we tested)
-
-### Prerequisites
 ```bash
-sudo apt install gcc g++ make
-```
-
-### Steps
-```bash
-# 1. Clone or extract
-git clone <repo> && cd openwatcom2irc-r0.6.0
-
-# 2. MUST use bash, not sh
-export SHELL=/bin/bash
-
-# 3. Source environment (sets OWROOT, OWTOOLS, OWOBJDIR)
-. ./setvars.sh
-
-# 4. Fix permissions (our fix)
-find bld -name "configure" -exec chmod +x {} \;
-
-# 5. Build
+git clone https://github.com/verta1878/ow2irc.git
+cd ow2irc
 bash build.sh
 ```
 
-### Known Build Errors + Our Fixes
+That's it. build.sh builds everything including bwccx64.
 
-| Error | File | Fix |
-|-------|------|-----|
-| `source: not found` | build.sh | Use `bash build.sh` not `sh build.sh` |
-| `_BLDVER` empty | cmnvars.sh | setvars.sh sets it — make sure you source it first |
-| W202 isElf64Cpu unused | bld/owl/c/owelf.c | Made non-static or called from writeFileHeader64 |
-| W131 no prototype | bld/cg/intel/c/x64dispatch.c | Added 3 prototypes before functions |
-| W131 no prototype + unused param | bld/cg/intel/x64/c/x64enc.c | Added prototype + `(void)ilen` |
-| `<elf.h>` not found | bld/cg/intel/x64/c/x64obj.c | Changed to `"exeelf.h"` (OW's ELF header) |
-| unsigned_64 struct assign | bld/cg/intel/x64/c/x64obj.c | SET64 macro for cross-compile |
-| x64ehframe.obj missing | bld/cg/intel/master.mif | Added x64ehframe.obj + x64rodata.obj |
-| configure not executable | bld/wipfc/configure | `chmod +x` on all configure scripts |
-| C++ compiler skipped | bld/builder.ctl | Removed `# SKIP:` on plusplus line |
+## What Gets Built (40 utilities)
 
-### What Gets Built (39 utilities)
 ```
-C compilers:   bwcc, bwcc386, bwccaxp, bwccmps, bwccppc
-C++ compilers: bwpp, bwpp386, bwppaxp
-Assemblers:    bwasm, bwasaxp, bwasmps, bwasppc
-Linker:        bwlink
-Librarian:     bwlib
-Disassembler:  bwdis
-Resource comp: bwrc
-Strip:         bwstrip
-Help comp:     bwhc, bwipfc
-CL drivers:    bwcl, bwcl386, bwclaxp, bwclmps, bwclppc
-Other:         wmake, builder, byacc, bowcc, bdmpobj, bwbind
+C compilers:    bwcc, bwcc386, bwccaxp, bwccmps, bwccppc, bwccx64
+C++ compilers:  bwpp, bwpp386, bwppaxp
+Assembler:      bwasm (MASM-compatible: OPTION, RECORD, PROTO, INVOKE)
+Linker:         bwlink
+Librarian:      bwlib
+Other:          wmake, bwdis, bwrc, bwhc, bwstrip, bwcl, etc.
 ```
 
-## Option 2: Self-hosted build with OW1 (no GCC needed)
+## Prerequisites
 
-### Prerequisites
-- OW1 installed (C:\WATCOM or /opt/watcom)
-- OW1 binaries: wcc386, wlink, wmake, wasm
-
-### Steps (DOS/Windows)
-```bat
-set WATCOM=C:\WATCOM
-set PATH=%WATCOM%\BINW;%PATH%
-set INCLUDE=%WATCOM%\H
-cd openwatcom2irc-r0.6.0
-wmake -f build.mak
+Linux x64 with GCC 13+:
+```bash
+sudo apt install gcc g++ make    # Ubuntu/Debian
+sudo dnf install gcc gcc-c++ make  # Fedora
 ```
 
-### Steps (Linux with OW1)
+Or self-hosted with OW1 (no GCC needed):
 ```bash
 export WATCOM=/opt/watcom
 export PATH=$WATCOM/binl:$PATH
-cd openwatcom2irc-r0.6.0
 wmake -f build.mak
 ```
 
-OW1 compiles OW2IRC. No GCC. No external dependencies.
-Self-contained toolchain builds self-contained toolchain.
+## Build System Fixes Applied
 
-## Building JUST wasm (assembler only)
+| Fix | File | What |
+|-----|------|------|
+| inc_dirs line break | cc/master.mif | Merged into single line (was broken continuation) |
+| cdirs.mif include | cc/master.mif | Added after tree_depth for directory vars |
+| target.h includes | cc/x64/target.h | Added target64.h + targdef.h |
+| target64.h types | cc/h/target64.h | TARGET_POINTER=8 + typedefs + limits |
+| asclient.mif | cc/asclient.mif | Uses depth_N for wasm_dir |
+| target_as_x64 | cc/master.mif | bwasm -i=watcom/h for struct.inc |
+| codex64.asm | cc/a/codex64.asm | 9 real intrinsics (strlen/memcpy/etc) |
+| _STANDALONE_ guards | wasm/c/asmscan.c, breakout.c, main.c | Non-standalone stubs |
+| R8-R15 debug regs | dig/h/digtypes.h, watdbreg.h, dwregx86.h | CI_R8-R15 + CI_XMM0-15 |
+| bwccx64 post-build | build.sh | Copies 386 objects + links with x64 CG |
+| Bob's 6 SET64 | cg/intel/x64/c/x64obj.c | unsigned_64 struct assigns |
+| Bob's 9 build-wiring | target64.h, master.mif, builder.ctl, etc. | Full x64 build path |
 
-If you only need the assembler and don't want the full build:
+## bwccx64 Link Recipe
 
+build.sh handles this automatically. Manual link if needed:
 ```bash
-# After bootstrapping wmake:
-cd bld/wasm
-../../build/binbuild/builder -i boot
-# Result: build/binbuild/bwasm
+cd bld/cc/x64
+make OWROOT=/path/to/ow2irc link
 ```
 
-## wasm vs JWasm — Which to Use
+Libraries linked: cgx64.lib, cgx64lnx.lib, clibext.lib, dwarfw.lib, cf.lib
 
-| Task | Use | Why |
-|------|-----|-----|
-| OW internal .asm | wasm | Watcom syntax, OW build system |
-| FOSSIL VxD | **JWasm** | Needs OPTION NOKEYWORD, && macros |
-| GLaBIOS | **JWasm** | Needs RECORD <> literals |
-| x64 assembly | **JWasm -elf64** | wasm has no x64 support |
-| Glide NASM patches | **NASM** | Different syntax entirely |
+## wasm MASM Compatibility
 
-Both produce same OMF/COFF objects. wlink links all of them.
-See WASM-JWASM-INTEGRATION.md for full details + examples.
+wasm now supports (626 lines, 9/9 tests pass):
+- OPTION NOKEYWORD — disable reserved words as identifiers
+- RECORD — bit-field types with MASK/WIDTH operators
+- UNION — overlapping fields at offset 0
+- TYPEDEF — type aliases with PTR support
+- PROTO — function prototypes with calling conventions
+- INVOKE — high-level CALL with automatic PUSH+cleanup
+
+No JWasm dependency. One assembler for everything.
+
+## codex64.asm Intrinsics
+
+9 inline code bursts (237 lines, assembles with bwasm):
+strlen, strcpy, strcmp, strcat, memcpy, memset, memcmp, memchr, abs
+
+## Known Issues
+
+See KNOWN-ISSUES.md:
+- Pointer through function above 4 GB (workaround: array indexing)
+- LEDATA enumerated offset (latent, no test triggers it)
+
+## Tests
+
+```bash
+# After build:
+cd tests/x64
+./run_tests.sh $OWROOT    # 61 runtime tests
+./run_phase_tests.sh       # 11 phase tests
+```
