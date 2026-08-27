@@ -98,6 +98,15 @@ static void eh_emit_sleb128(int64_t v) {
     eh_emit(tmp, n);
 }
 
+/* FDE location tracking for .rela.eh_frame relocations */
+#define MAX_FDES 256
+static int fde_eh_offset[MAX_FDES];
+static uint32_t fde_code_addr[MAX_FDES];
+static int num_fdes = 0;
+
+int eh_frame_get_num_fdes(void) { return num_fdes; }
+int eh_frame_get_fde_offset(int i) { return fde_eh_offset[i]; }
+
 /* ====================================================================
  * CIE — Common Information Entry
  *
@@ -112,6 +121,7 @@ void eh_frame_init(void)
 {
     eh_pos = 0;
     eh_cie_offset = -1;
+    num_fdes = 0; /* reset FDE tracking */
     eh_current_fde = -1;
     eh_last_code_offset = 0;
 
@@ -165,7 +175,12 @@ void eh_frame_begin_function(const char *name, uint64_t addr, uint64_t size)
     uint32_t cie_delta = eh_pos - eh_cie_offset;
     eh_emit_u32(cie_delta);
 
-    /* PC begin (absolute 4-byte, no augmentation) */
+    /* PC begin — record location for .rela.eh_frame relocation */
+    if( num_fdes < MAX_FDES ) {
+        fde_eh_offset[num_fdes] = eh_pos;  /* offset in eh_buf */
+        fde_code_addr[num_fdes] = (uint32_t)addr;
+        num_fdes++;
+    }
     eh_emit_u32((uint32_t)addr);
 
     /* PC range */

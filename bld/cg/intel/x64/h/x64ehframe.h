@@ -40,3 +40,7 @@ void eh_frame_finalize(void);
 void eh_frame_emit_file_symbol(const char *filename);
 void eh_frame_emit_gnu_property(void);
 #endif
+
+/* FDE tracking for .rela.eh_frame */
+int eh_frame_get_num_fdes(void);
+int eh_frame_get_fde_offset(int i);

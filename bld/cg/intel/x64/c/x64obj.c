@@ -1002,6 +1002,7 @@ void X64ObjFini( void )
     int str_ehframe = st_len; memcpy(strtab+st_len, ".eh_frame", 10); st_len += 10;
     /* Phase 7: .rodata section string */
     int str_rodata = st_len;  memcpy(strtab+st_len, ".rodata", 8);    st_len += 8;
+    int str_relaeh = st_len;  memcpy(strtab+st_len, ".rela.eh_frame", 15); st_len += 15;
     int str_pub[512];
     for( int q = 0; q < pub_count; q++ ) {
         str_pub[q] = st_len;
@@ -1381,6 +1382,8 @@ void X64ObjFini( void )
         fwrite(eh_buf, 1, eh_pos, fp_out);
     { char pad[8] = {0}; fwrite(pad, 1, ehframe_pad, fp_out); }
     /* String table — record actual file position */
+    long rela_eh_off = 0;
+    long actual_ehframe_off = 0;
     long actual_strtab_off = ftell(fp_out);
     fwrite(strtab, 1, st_len, fp_out);
     { char pad[8] = {0}; fwrite(pad, 1, strtab_pad, fp_out); }
@@ -1497,14 +1500,30 @@ void X64ObjFini( void )
      * GDB reads this for backtraces. ld reads it for exception handling.
      * ================================================================ */
     eh_frame_finalize();
-    eh_pos = 0; /* Disable until .rela.eh_frame implemented */
+    if( eh_frame_get_num_fdes() == 0 ) eh_pos = 0; /* No FDEs → skip CIE-only .eh_frame */
     if( eh_pos > 0 ) {
         memset(&shdr, 0, sizeof(shdr));
         shdr.sh_name = str_ehframe;
         shdr.sh_type = SHT_PROGBITS;
         SET64(shdr.sh_flags, SHF_ALLOC);
-        SET64(shdr.sh_offset, ehframe_off);
+        SET64(shdr.sh_offset, actual_ehframe_off > 0 ? actual_ehframe_off : ehframe_off);
         SET64(shdr.sh_size, eh_pos);
+        SET64(shdr.sh_addralign, 8);
+        fwrite(&shdr, 1, sizeof(shdr), fp_out);
+    }
+
+    /* .rela.eh_frame — relocations for FDE initial_location fields */
+    int num_eh_relas = eh_frame_get_num_fdes();
+    if( eh_pos > 0 && num_eh_relas > 0 ) {
+        memset(&shdr, 0, sizeof(shdr));
+        shdr.sh_name = str_relaeh;
+        shdr.sh_type = SHT_RELA;
+        SET64(shdr.sh_flags, SHF_INFO_LINK);
+        SET64(shdr.sh_offset, rela_eh_off);  /* set during data write */
+        SET64(shdr.sh_size, num_eh_relas * sizeof(Elf64_Rela));
+        SET64(shdr.sh_entsize, sizeof(Elf64_Rela));
+        shdr.sh_link = SEC_SYMTAB;  /* symtab section */
+        shdr.sh_info = 8;  /* .eh_frame section index (original) */
         SET64(shdr.sh_addralign, 8);
         fwrite(&shdr, 1, sizeof(shdr), fp_out);
     }
@@ -1527,8 +1546,8 @@ void X64ObjFini( void )
     /* Final header patches: correct e_shnum and e_shstrndx 
      * based on how many sections were actually written. */
     {
-        int actual_shnum = (eh_pos > 0) ? nsec : nsec - 1;
-        int actual_strndx = actual_shnum - 2; /* .strtab is 2nd from last (.rodata is last) */
+        int actual_shnum = (eh_pos > 0) ? nsec + (num_eh_relas > 0 ? 1 : 0) : nsec - 1;
+        int actual_strndx = 7; /* .strtab is always section 7: null,text,data,bss,symtab,rela,.note,.strtab */
         fseek(fp_out, 60, SEEK_SET);
         unsigned short sn = (unsigned short)actual_shnum;
         fwrite(&sn, 1, 2, fp_out);
