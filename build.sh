@@ -102,13 +102,32 @@ if [ -d "$OWROOT/bld/cc/x64" ]; then
     -I"$OWROOT/bld/owl/h" -I"$OWROOT/bld/comp_cfg/h" -I"$OWROOT/bld/cfloat/h" \
     -D_CPU=386 -D_TARG_X64=1 -DBOOTSTRAP -D__UNIX__ -D__LINUX__ \
     "$OWROOT/bld/cg/intel/x64/c/x64obj.c" -o "$OWROOT/bld/cg/intel/x64/binbuild/x64obj.obj" 2>/dev/null
-  # Rebuild CG library with fixed x64obj:
+  # Copy shared 386 CG objects that x64 depends on (register tables,
+  # instruction encoder, type system — x64 uses the 386 code generator)
+  echo "  Copying shared 386 CG objects to x64..."
+  for obj in 386rgtbl 386table 386ilen 386enc 386score 386conv 386type \
+    386rtrtn 386optab 386ptype 386opseg 386sib 386splt2 386tls \
+    rtcall sib encode x86esc x86enc x86proc x86sel x86obj \
+    verify optrel split regalloc conflict peepopt \
+    386funit i87data i87exp i87opt i87reg i87sched \
+    x64dispatch; do
+    cp -f "$OWROOT/bld/cg/intel/386/binbuild/${obj}.obj" \
+          "$OWROOT/bld/cg/intel/x64/binbuild/" 2>/dev/null
+  done
+  # Copy ALL 386 CG objects that aren't already in x64 (catch stragglers)
+  cp -n "$OWROOT/bld/cg/intel/386/binbuild/"*.obj \
+        "$OWROOT/bld/cg/intel/x64/binbuild/" 2>/dev/null
+  # Remove OMF mkcode intermediates (not linkable ELF)
+  rm -f "$OWROOT/bld/cg/intel/x64/binbuild/code386.obj" \
+        "$OWROOT/bld/cg/intel/x64/binbuild/codex64.obj" 2>/dev/null
+  # Rebuild CG library with all objects:
   cd "$OWROOT/bld/cg/intel/x64/binbuild"
   ar rcs cgx64.lib *.obj 2>/dev/null
   cp cgx64.lib cgx64lnx.lib 2>/dev/null
   cd "$OWROOT"  2>/dev/null
   cp -n "$OWROOT/bld/cc/386/binbuild/"*.gh  "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
   cp -n "$OWROOT/bld/cc/386/binbuild/"*.grh "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
+  cp -n "$OWROOT/bld/wasm/binbuild/"*.grh   "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
   cd "$OWROOT/bld/cc/x64"
   make -s OWROOT="$OWROOT" asm_objs link 2>&1 || true
   cd "$OWROOT"
