@@ -1033,33 +1033,56 @@ void X64ObjFini( void )
                 pub_offs[q] = omap[pub_offs[q]];
         }
 
-        /* Adjust short branch displacements (Jcc 0x70-0x7F, JMP 0xEB) */
+        /* Adjust branch displacements after REX expansion */
         {
             int j;
             for( j = 0; j < nlen; j++ ) {
                 unsigned char opc = new_code[j];
+
+                /* Short Jcc (0x70-0x7F) and JMP short (0xEB): 1-byte disp */
                 int is_jcc = (opc >= 0x70 && opc <= 0x7F);
                 int is_jmp = (opc == 0xEB);
                 if( (is_jcc || is_jmp) && j + 1 < nlen ) {
                     int8_t old_disp = (int8_t)new_code[j + 1];
-                    /* The branch was emitted at some original offset.
-                     * Find the original offset of this instruction: */
                     int orig_j = -1;
                     int k;
                     for( k = 0; k <= combined_len; k++ ) {
                         if( omap[k] == j ) { orig_j = k; break; }
                     }
                     if( orig_j < 0 ) { j++; continue; }
-                    /* Original target = orig_j + 2 + old_disp */
                     int orig_target = orig_j + 2 + old_disp;
                     if( orig_target >= 0 && orig_target <= combined_len ) {
                         int new_target = omap[orig_target];
                         int new_disp = new_target - (j + 2);
-                        if( new_disp >= -128 && new_disp <= 127 ) {
+                        if( new_disp >= -128 && new_disp <= 127 )
                             new_code[j + 1] = (uint8_t)(int8_t)new_disp;
+                    }
+                    j++;
+                    continue;
+                }
+
+                /* CALL rel32 (0xE8) and JMP rel32 (0xE9): 4-byte disp */
+                if( (opc == 0xE8 || opc == 0xE9) && j + 4 < nlen ) {
+                    int32_t old_disp;
+                    memcpy(&old_disp, new_code + j + 1, 4);
+                    /* Only adjust non-zero displacements (zero = external reloc) */
+                    if( old_disp != 0 ) {
+                        int orig_j = -1;
+                        int k;
+                        for( k = 0; k <= combined_len; k++ ) {
+                            if( omap[k] == j ) { orig_j = k; break; }
+                        }
+                        if( orig_j >= 0 ) {
+                            int orig_target = orig_j + 5 + old_disp;
+                            if( orig_target >= 0 && orig_target <= combined_len ) {
+                                int new_target = omap[orig_target];
+                                int32_t new_disp = new_target - (j + 5);
+                                memcpy(new_code + j + 1, &new_disp, 4);
+                            }
                         }
                     }
-                    j++; /* skip displacement byte */
+                    j += 4;
+                    continue;
                 }
             }
         }
