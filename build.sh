@@ -120,6 +120,8 @@ if [ -d "$OWROOT/bld/cc/x64" ]; then
   # Remove OMF mkcode intermediates (not linkable ELF)
   rm -f "$OWROOT/bld/cg/intel/x64/binbuild/code386.obj" \
         "$OWROOT/bld/cg/intel/x64/binbuild/codex64.obj" 2>/dev/null
+  rm -f "$OWROOT/bld/cc/x64/binbuild/code386.obj" \
+        "$OWROOT/bld/cc/x64/binbuild/codex64.obj" 2>/dev/null
   # Rebuild CG library with all objects:
   cd "$OWROOT/bld/cg/intel/x64/binbuild"
   ar rcs cgx64.lib *.obj 2>/dev/null

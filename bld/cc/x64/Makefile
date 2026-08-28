@@ -78,7 +78,7 @@ asm_objs:
 
 # Link only (objects already compiled by build.sh)
 link:
-	$(CC) -o binbuild/bwccx64 binbuild/*.obj $(LIBS) $(LDFLAGS)
+	FILTERED=$$(ls binbuild/*.obj | grep -v 'code386\.obj\|codex64\.obj'); $(CC) -o binbuild/bwccx64 $$FILTERED $(LIBS) $(LDFLAGS)
 	chmod +x binbuild/bwccx64
 	cp binbuild/bwccx64 $(OWROOT)/build/binbuild/bwccx64
 	@echo "=== bwccx64 linked ==="
