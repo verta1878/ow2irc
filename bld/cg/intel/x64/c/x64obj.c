@@ -1069,6 +1069,30 @@ void X64ObjFini( void )
                 }
             }
 
+            /* x87 SIB fix: CG emits SIB=0x25 (RBP base) instead of
+             * 0x24 (RSP base) for stack-relative FP operations in
+             * optimized code (no frame pointer). Fix by changing
+             * SIB byte from 25→24 when preceded by x87 opcode. */
+            if( p + 3 < combined_len ) {
+                unsigned char op = code_seg1[p];
+                /* x87 opcodes: D8-DF. Check modrm for SIB presence */
+                if( op >= 0xD8 && op <= 0xDF ) {
+                    unsigned char modrm = code_seg1[p+1];
+                    if( (modrm & 0x07) == 0x04 ) { /* rm=100 → SIB follows */
+                        if( code_seg1[p+2] == 0x25 ) {
+                            /* SIB=25 (base=RBP) → 24 (base=RSP) */
+                            new_code[nlen++] = code_seg1[p++]; /* opcode */
+                            omap[p] = nlen;
+                            new_code[nlen++] = code_seg1[p++]; /* modrm */
+                            omap[p] = nlen;
+                            new_code[nlen++] = 0x24;           /* fixed SIB */
+                            p++; /* skip original 0x25 */
+                            continue;
+                        }
+                    }
+                }
+            }
+
             /* 2-field struct init: 8B 05 d0d1d2d3 89 04 24 */
             if( p + 9 <= combined_len && code_seg1[p] == 0x8B && code_seg1[p+1] == 0x05 &&
                 code_seg1[p+6] == 0x89 && code_seg1[p+7] == 0x04 && code_seg1[p+8] == 0x24 &&
@@ -1127,13 +1151,21 @@ void X64ObjFini( void )
                 int is_jcc = (opc >= 0x70 && opc <= 0x7F);
                 int is_jmp = (opc == 0xEB);
                 if( (is_jcc || is_jmp) && j + 1 < nlen ) {
-                    int8_t old_disp = (int8_t)new_code[j + 1];
+                    /* Verify this byte was an instruction start in
+                     * the original code (not a modrm/SIB/operand) */
                     int orig_j = -1;
                     int k;
                     for( k = 0; k <= combined_len; k++ ) {
                         if( omap[k] == j ) { orig_j = k; break; }
                     }
                     if( orig_j < 0 ) { j++; continue; }
+                    /* Cross-check: verify it's not a modrm inside an x87 instruction */
+                    if( code_seg1[orig_j] != opc ) { j++; continue; }
+                    /* If preceded by x87 opcode (D8-DF), this is modrm not Jcc */
+                    if( orig_j > 0 && code_seg1[orig_j-1] >= 0xD8 && code_seg1[orig_j-1] <= 0xDF ) { j++; continue; }
+                    /* If preceded by 0F (two-byte opcode prefix), this is not a short Jcc */
+                    if( orig_j > 0 && code_seg1[orig_j-1] == 0x0F ) { j++; continue; }
+                    int8_t old_disp = (int8_t)new_code[j + 1];
                     int orig_target = orig_j + 2 + old_disp;
                     if( orig_target >= 0 && orig_target <= combined_len ) {
                         int new_target = omap[orig_target];
