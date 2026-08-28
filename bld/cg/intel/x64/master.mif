@@ -1,6 +1,6 @@
 tree_depth = 5
 
-target_cpu      = 386
+target_cpu      = x64
 target_cls      = intel
 
 386_objs = 386conv.obj &
@@ -22,3 +22,6 @@ target_cls      = intel
     encode.obj
 
 !include $(cg_dir)/$(target_cls)/master.mif
+
+# Include 386 CG sources for shared functions
+.c: ../../386/c

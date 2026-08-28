@@ -44,3 +44,4 @@ void eh_frame_emit_gnu_property(void);
 /* FDE tracking for .rela.eh_frame */
 int eh_frame_get_num_fdes(void);
 int eh_frame_get_fde_offset(int i);
+uint32_t eh_frame_get_fde_code_addr(int i);

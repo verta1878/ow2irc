@@ -106,6 +106,7 @@ static int num_fdes = 0;
 
 int eh_frame_get_num_fdes(void) { return num_fdes; }
 int eh_frame_get_fde_offset(int i) { return fde_eh_offset[i]; }
+uint32_t eh_frame_get_fde_code_addr(int i) { return fde_code_addr[i]; }
 
 /* ====================================================================
  * CIE — Common Information Entry

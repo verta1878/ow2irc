@@ -1,5 +1,87 @@
 # Changelog
 
+## r0.6.0 — ELF64 writer overhaul + end-to-end verified (2026-08-27)
+
+**bwccx64 compiles, links, and runs "Hello from bwccx64!" — zero
+warnings, zero errors, clean link.** build.sh builds everything
+automatically. All known issues resolved.
+
+### Fixed (ELF64 object writer — x64obj.c)
+- STT_FILE symbol written between section headers — moved to symbol table.
+- Duplicate STT_FILE symbol — removed.
+- num_syms off by one (4→5) — STT_FILE not counted.
+- e_shoff wrong — dynamic ftell() patching after all data written.
+- strtab offset mismatch — actual_strtab_off via ftell().
+- ELF64_R_INFO(s<<32) on 32-bit int = UNDEFINED BEHAVIOR — #undef +
+  cast to unsigned long long. Root cause of all relocations having sym=0.
+- anchor vs sym index — anchor=SEC_DATA=2 but sym .data=3 (STT_FILE
+  shifts by 1). Added anchor+1 in ELF64_R_INFO.
+- sizeof(data_seg2) returned pointer size (8) not allocated size —
+  changed to omf_size. Root cause of string literals missing from .data.
+- .eh_frame CIE-only output with no FDEs — skip when
+  eh_frame_get_num_fdes()==0. Dynamic e_shnum/e_shstrndx patching.
+  Clean link, no warnings.
+
+### Fixed (build system)
+- inc_dirs broken line continuation (space instead of &) — merged into
+  single line. Root cause of all x64 CC header-not-found errors.
+- cdirs.mif not included in CC master.mif — added after tree_depth.
+  Resolves wasm_dir, cg_dir, dwarfw_dir, comp_cfg_dir for x64.
+- x64/target.h missing target64.h + targdef.h — added. Provides
+  target_size typedef and _INTEL_CPU macro.
+- asclient.mif — uses depth_N for wasm_dir resolution.
+- target_as_x64 — added -i=watcom/h for struct.inc.
+- build.sh post-build after exit — moved before exit.
+- build.sh recompiles cgen.c + cmdlnx86.c + x64obj.c with
+  -D_TARG_X64=1 so OMF→ELF64 conversion activates.
+- build.sh copies 386 CC objects to x64 + links with x64 CG.
+- build.sh builds bwpp386 + bwppx64 (C++ x64 compiler).
+
+### Fixed (runtime)
+- crt0_x64.S _start: popq argc instead of movq (stack frame corruption
+  after AND alignment). Alignment dummy push before call main.
+- puts() uses EAX (Watcom calling convention, matches 386 CG output).
+- __CHK / __GRO verified correct (ret $8, matching GenUnkPush+DoRTCall).
+
+### Fixed (codegen)
+- X64ObjInit/X64ObjFini wired into cgen.c (guarded by _TARG_X64).
+  Enables OMF→ELF64 post-processing during compilation.
+- ParmReg() dispatches to X64ParmReg() when _TARG_X64 defined.
+  SysV ABI parameter passing: RDI/RSI/RDX/RCX/R8/R9.
+- LEDATA enumerated-data-offset read and used. Handles sparse
+  emitters, zero-fills gaps.
+
+### Added
+- codex64.asm — 237 lines, 9 real intrinsics (strlen, strcpy, strcmp,
+  strcat, memcpy, memset, memcmp, memchr, abs). Same macro format as
+  code386.asm. Assembles with bwasm. No stubs.
+- wasm MASM port — 626 lines (asmoption.c, asmrecord.c, asminvoke.c).
+  OPTION NOKEYWORD wired into scanner. RECORD bit-fields MASK/WIDTH.
+  UNION overlapping fields. TYPEDEF type aliases. PROTO function
+  prototypes with calling conventions. INVOKE high-level CALL with
+  PUSH+CALL codegen wired to InputQueueLine. 9/9 tests pass.
+- R8-R15 + XMM0-15 debug registers (digtypes.h, dwregx86.h, watdbreg.h).
+- .eh_frame infrastructure (x64ehframe.c): CIE with correct x64 DWARF
+  registers (RA=16, RSP=7, RBP=6). FDE tracking (fde_eh_offset[],
+  fde_code_addr[]). .rela.eh_frame section code. Activates automatically
+  when CG emits standard prologues.
+- bld/cc/x64/Makefile — standalone link recipe (85 lines).
+- plusplus/x64 — target.mif, binmake, builder.ctl, target.h.
+- Bob's 6 SET64 fixes (unsigned_64 struct assigns in x64obj.c).
+- Bob's 9 build-wiring fixes (target64.h, master.mif, builder.ctl,
+  intel/master.mif objects+paths).
+- _STANDALONE_ guards on asmscan.c, breakout.c, main.c.
+- CHECKSUMS.sha256 annotated (.obj files are gitignored).
+- OW2IRC-BUILD-GUIDE.md updated (99 lines).
+- KNOWN-ISSUES.md: all resolved, moved to todo/.
+
+### Summary
+42 utilities built. 4,871 lines x64 CG + 1,196 lines musl-ow + 626
+lines wasm MASM + 237 lines codex64.asm. Self-hosted with OW1.
+133 tests, 0 failures. bob + sysop/0. nine crew. the crew 4free.
+
+---
+
 ## r0.6.0 — additions & fixes (2026-08-20)
 
 No new feature surface vs r0.6.0 — additions and bug fixes on the same

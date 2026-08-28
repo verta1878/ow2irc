@@ -19,7 +19,7 @@ CFLAGS = -g -O2 -w \
   -I$(BLDDIR)/wasm/h \
   -I$(BLDDIR)/fe_misc/h \
   -I$(BLDDIR)/owl/h \
-  -Ibinbuild \
+  -Ibinbuild -I$(BLDDIR)/wasm/binbuild \
   -D_CPU=386 -DBOOTSTRAP -D__UNIX__ -D__LINUX__
 
 # Libraries (built during build.sh)
@@ -59,7 +59,9 @@ all: binbuild/bwccx64
 
 # Link using whatever .obj files exist (from build.sh + our extras)
 binbuild/bwccx64: asm_objs
-	$(CC) -o $@ binbuild/*.obj $(LIBS) $(LDFLAGS)
+	# Filter out OMF mkcode intermediates (not linkable ELF)
+	FILTERED=$$(ls binbuild/*.obj | grep -v 'code386\.obj\|codex64\.obj')
+	$(CC) -o $@ $$FILTERED $(LIBS) $(LDFLAGS)
 	chmod +x $@
 	cp $@ $(OWROOT)/build/binbuild/bwccx64
 
@@ -70,7 +72,7 @@ asm_objs:
 	  obj=binbuild/$$(basename $$src .c).obj; \
 	  if [ ! -f "$$obj" ] || [ "$$src" -nt "$$obj" ]; then \
 	    echo "  CC $$src"; \
-	    $(CC) -c $(CFLAGS) -Ibinbuild $$src -o $$obj; \
+	    $(CC) -c $(CFLAGS) -Ibinbuild -I$(BLDDIR)/wasm/binbuild $$src -o $$obj; \
 	  fi; \
 	done
 
