@@ -982,7 +982,94 @@ void X64ObjFini( void )
      * the code stays a pure offset within its segment; the relocation addend
      * carries the segment base. Nothing to patch into the code here. */
     int combined_len = code_seg1_len;
-    (void)combined_len;
+
+    /* ================================================================
+     * REX.W expansion: patch 32-bit INC/DEC to 64-bit for pointers.
+     * The 386 CG emits INC EAX (FF C0) for pointer++. On x64,
+     * stack addresses are above 4GB — need INC RAX (48 FF C0).
+     * ================================================================ */
+    {
+        unsigned char *new_code = (unsigned char *)malloc(combined_len * 2);
+        int *omap = (int *)calloc(combined_len + 1, sizeof(int));
+        int nlen = 0;
+        int p;
+
+        for( p = 0; p < combined_len; ) {
+            omap[p] = nlen;
+
+            /* INC/DEC reg: FF C0-CF */
+            if( code_seg1[p] == 0xFF && p + 1 < combined_len &&
+                (code_seg1[p+1] & 0xF0) == 0xC0 ) {
+                new_code[nlen++] = 0x48;  /* REX.W */
+                new_code[nlen++] = code_seg1[p++];
+                new_code[nlen++] = code_seg1[p++];
+                continue;
+            }
+            /* ADD/SUB reg, imm8: 83 Cx xx — only if no REX already */
+            if( code_seg1[p] == 0x83 && p + 2 < combined_len &&
+                (code_seg1[p+1] & 0xC0) == 0xC0 ) {
+                int op = (code_seg1[p+1] >> 3) & 7;
+                if( op == 0 || op == 5 || op == 7 ) {
+                    /* Skip if previous byte is already a REX prefix */
+                    if( nlen == 0 || (new_code[nlen-1] & 0xF0) != 0x40 ) {
+                        new_code[nlen++] = 0x48;
+                    }
+                }
+            }
+            new_code[nlen++] = code_seg1[p++];
+        }
+        omap[combined_len] = nlen;
+
+        /* Adjust fixup offsets */
+        for( int f = 0; f < fixup_count; f++ ) {
+            int old_off = fixups[f].code_offset;
+            if( old_off >= 0 && old_off < combined_len )
+                fixups[f].code_offset = omap[old_off];
+        }
+
+        /* Adjust public symbol offsets */
+        for( int q = 0; q < pub_count; q++ ) {
+            if( pub_offs[q] < (unsigned)combined_len )
+                pub_offs[q] = omap[pub_offs[q]];
+        }
+
+        /* Adjust short branch displacements (Jcc 0x70-0x7F, JMP 0xEB) */
+        {
+            int j;
+            for( j = 0; j < nlen; j++ ) {
+                unsigned char opc = new_code[j];
+                int is_jcc = (opc >= 0x70 && opc <= 0x7F);
+                int is_jmp = (opc == 0xEB);
+                if( (is_jcc || is_jmp) && j + 1 < nlen ) {
+                    int8_t old_disp = (int8_t)new_code[j + 1];
+                    /* The branch was emitted at some original offset.
+                     * Find the original offset of this instruction: */
+                    int orig_j = -1;
+                    int k;
+                    for( k = 0; k <= combined_len; k++ ) {
+                        if( omap[k] == j ) { orig_j = k; break; }
+                    }
+                    if( orig_j < 0 ) { j++; continue; }
+                    /* Original target = orig_j + 2 + old_disp */
+                    int orig_target = orig_j + 2 + old_disp;
+                    if( orig_target >= 0 && orig_target <= combined_len ) {
+                        int new_target = omap[orig_target];
+                        int new_disp = new_target - (j + 2);
+                        if( new_disp >= -128 && new_disp <= 127 ) {
+                            new_code[j + 1] = (uint8_t)(int8_t)new_disp;
+                        }
+                    }
+                    j++; /* skip displacement byte */
+                }
+            }
+        }
+
+        memcpy(code_seg1, new_code, nlen);
+        combined_len = nlen;
+        code_seg1_len = nlen;
+        free(new_code);
+        free(omap);
+    }
 
     /* ============================================================
      * Write ELF64 with .rela.text
