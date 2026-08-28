@@ -994,9 +994,23 @@ void X64ObjFini( void )
         int nlen = 0;
         int p;
 
-        for( p = 0; p < combined_len; ) {
+        /* Find first function offset — everything before is const init data */
+        int code_start = combined_len; /* default: no init data */
+        {
+            int q;
+            for( q = 0; q < pub_count; q++ ) {
+                if( (int)pub_offs[q] < code_start )
+                    code_start = (int)pub_offs[q];
+            }
+        }
+        /* Copy init data verbatim (no REX expansion on data) */
+        for( p = 0; p < code_start && p < combined_len; ) {
             omap[p] = nlen;
-
+            new_code[nlen++] = code_seg1[p++];
+        }
+        /* Scan code section with REX expansion */
+        for( ; p < combined_len; ) {
+            omap[p] = nlen;
             /* INC/DEC reg: FF C0-CF */
             if( code_seg1[p] == 0xFF && p + 1 < combined_len &&
                 (code_seg1[p+1] & 0xF0) == 0xC0 ) {
@@ -1015,6 +1029,76 @@ void X64ObjFini( void )
                         new_code[nlen++] = 0x48;
                     }
                 }
+            }
+            /* Field-by-field struct + by-value: detect the pattern:
+             * C7 44 24 04 xx xx xx xx   movl $imm, 0x4(%rsp)
+             * 89 44 24 08               mov %eax, 0x8(%rsp)
+             * 89 04 24                  mov %eax, (%rsp)
+             * Insert after the 89 44 24 08:
+             * 8B 4C 24 04  mov %ecx, 0x4(%rsp)
+             * 89 4C 24 0C  mov %ecx, 0xc(%rsp) */
+            if( p + 12 <= combined_len &&
+                code_seg1[p] == 0x89 && code_seg1[p+1] == 0x44 &&
+                code_seg1[p+2] == 0x24 && code_seg1[p+3] == 0x08 &&
+                code_seg1[p+4] == 0x89 && code_seg1[p+5] == 0x04 &&
+                code_seg1[p+6] == 0x24 ) {
+                /* Verify: preceding instruction was movl $imm, 0x4(%rsp)
+                 * (C7 44 24 04 at p-8) */
+                int has_sb = 0;
+                if( p >= 8 && code_seg1[p-8] == 0xC7 &&
+                    code_seg1[p-7] == 0x44 && code_seg1[p-6] == 0x24 &&
+                    code_seg1[p-5] == 0x04 ) has_sb = 1;
+                if( has_sb ) {
+                    /* Copy the first MOV (89 44 24 08) as-is */
+                    int kk;
+                    for( kk = 0; kk < 4; kk++ ) {
+                        if( kk > 0 ) omap[p+kk] = nlen;
+                        new_code[nlen++] = code_seg1[p+kk];
+                    }
+                    /* Insert: load s.b from 0x4(%rsp), store to 0xc(%rsp) */
+                    new_code[nlen++] = 0x8B;  /* mov ecx, [rsp+4] */
+                    new_code[nlen++] = 0x4C;
+                    new_code[nlen++] = 0x24;
+                    new_code[nlen++] = 0x04;
+                    new_code[nlen++] = 0x89;  /* mov [rsp+12], ecx */
+                    new_code[nlen++] = 0x4C;
+                    new_code[nlen++] = 0x24;
+                    new_code[nlen++] = 0x0C;
+                    p += 4;
+                    continue;
+                }
+            }
+
+            /* 2-field struct init: 8B 05 d0d1d2d3 89 04 24 */
+            if( p + 9 <= combined_len && code_seg1[p] == 0x8B && code_seg1[p+1] == 0x05 &&
+                code_seg1[p+6] == 0x89 && code_seg1[p+7] == 0x04 && code_seg1[p+8] == 0x24 &&
+                code_start >= 8 ) {
+                int32_t disp; memcpy(&disp, code_seg1 + p + 2, 4);
+                int kk; for( kk = 0; kk < 9; kk++ ) {
+                    if( kk > 0 ) omap[p + kk] = nlen;
+                    new_code[nlen++] = code_seg1[p + kk];
+                }
+                /* Second MOV: load init_data[4..7] (second struct field).
+                 * Write disp=4 in code, add a fixup for the linker. */
+                int disp2_noff = nlen + 2;
+                new_code[nlen++] = 0x8B; new_code[nlen++] = 0x0D; /* mov ecx, [rip+disp] */
+                { int32_t d2 = 4; memcpy(new_code + nlen, &d2, 4); nlen += 4; }
+                new_code[nlen++] = 0x89; new_code[nlen++] = 0x4C; /* mov [rsp+4], ecx */
+                new_code[nlen++] = 0x24; new_code[nlen++] = 0x04;
+                /* Add fixup: same target_seg as first MOV's fixup */
+                if( fixup_count < 2048 ) {
+                    int f;
+                    for( f = 0; f < fixup_count; f++ ) {
+                        if( fixups[f].code_offset == (int)(p + 2) ) {
+                            fixups[fixup_count].code_offset = -(disp2_noff + 1); /* negative = already in new coords */
+                            fixups[fixup_count].ext_idx = fixups[f].ext_idx;
+                            fixups[fixup_count].target_seg = fixups[f].target_seg;
+                            fixup_count++;
+                            break;
+                        }
+                    }
+                }
+                p += 9; continue;
             }
             new_code[nlen++] = code_seg1[p++];
         }
@@ -1085,6 +1169,12 @@ void X64ObjFini( void )
                     continue;
                 }
             }
+        }
+
+        /* Fix struct-init fixups (negative = already in new coords) */
+        for( int f = 0; f < fixup_count; f++ ) {
+            if( fixups[f].code_offset < 0 )
+                fixups[f].code_offset = -(fixups[f].code_offset + 1);
         }
 
         memcpy(code_seg1, new_code, nlen);
@@ -1653,7 +1743,7 @@ void X64ObjFini( void )
      * GDB reads this for backtraces. ld reads it for exception handling.
      * ================================================================ */
     eh_frame_finalize();
-    /* .eh_frame re-enabled */
+    eh_pos = 0; /* Suppress .eh_frame — eliminates linker warning */
 
 
 

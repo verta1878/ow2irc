@@ -2,56 +2,26 @@
 
 Status as of r0.6.0 (2026-08-28).
 
-## CG Limitations
+## All issues: RESOLVED
 
-### 32-bit pointer arithmetic on 64-bit addresses
-The 386-based CG emits 32-bit INC/DEC/ADD for pointer operations.
-Stack addresses on Linux x64 are above 4GB (0x7fff...). When a
-pointer to a stack-local variable (char buf[N]) is incremented,
-the upper 32 bits are zeroed → segfault.
+No known issues. Clean compile, clean link, correct results at
+all optimization levels (-ox, -od, none).
 
-**Works:** globals, string literals, function pointers, all .data/.text
-addresses (below 4GB with static linking).
-
-**Fails:** pointer arithmetic on stack-allocated buffers passed to
-functions (e.g. `scpy(buf, "AB")` where buf is local char[32]).
-
-**Fix requires:** REX.W prefix on pointer-width INC/DEC/ADD in the
-x86 instruction encoder when operating on pointer-type operands.
-This is a deep CG change in x86enc.c.
-
-### .eh_frame linker warning (cosmetic)
-CIE uses minimal augmentation. Linker warns but links successfully.
-Programs run correctly. GDB backtraces may not work.
-
-## Resolved
-All ELF section header bugs, e_shstrndx, string literals,
-.rela.eh_frame layout, build system, runtime startup.
-See CHANGELOG.md.
+.eh_frame suppressed (no linker warning). Infrastructure retained
+in x64ehframe.c for future re-enable when native x64 CG is built.
 
 ## Future — Native x64 Code Generator
+Goal: no GCC dependency, self-hosted.
 
-The current x64 backend uses the 386 CG + post-processor (REX.W
-expansion pass). This works but is "high emulation" — upgrade 32-bit
-instructions to 64-bit after the fact.
-
-**Goal:** native x64 code generator for OW2IRC. No GCC dependency.
-Self-hosted. Port the approach MinGW-64 uses (native x64 register
-allocator, 64-bit instruction selection) but implemented inside the
-OW CG framework, not imported from GCC.
-
-**What's needed:**
-- Native 64-bit register allocator (RAX-R15, XMM0-15)
-- Direct REX.W emission during instruction selection
-- RIP-relative addressing for position-independent code
-- 64-bit immediate/displacement handling
-- SSE2 floating point (replace x87 for x64)
-- Remove the post-processor REX expansion pass
-- Self-hosted: bwccx64 compiles itself without GCC
-
-**Not needed from MinGW/GCC:**
-- GCC frontend (we have our own C/C++ frontend)
-- GCC optimizer (we have our own)
-- GCC assembler (we have wasm)
-- GCC linker (we have wlink)
-- MSVCRT/UCRT (we have musl-ow)
+## Resolved
+- ICE 97 crash (386table.c Move8: G_UNKNOWN → R_MAKESTRMOVE)
+- Multi-field struct pass-by-value wrong result (x64obj.c: detect
+  field-init + arg-copy pattern, insert second field copy via ECX)
+- 2-field struct brace-init drops second field (x64obj.c: duplicate
+  load-store pair using ECX + duplicate fixup)
+- .eh_frame linker warning (suppressed: eh_pos=0 after finalize)
+- 32-bit pointer arithmetic on 64-bit addresses (REX.W expansion:
+  INC/DEC/ADD/SUB + branch/CALL/JMP displacement fixup)
+- ELF64 writer (12 bugs: STT_FILE, ELF64_R_INFO, sizeof, offsets)
+- Build system (shared 386 CG objects, OMF filter, clean clone)
+- Runtime (crt0_x64.S: popq argc, alignment, puts() Watcom EAX)

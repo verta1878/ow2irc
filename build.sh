@@ -86,6 +86,13 @@ if [ -d "$OWROOT/bld/cc/x64" ]; then
   echo "=== Building bwccx64 ==="
   # Copy ALL 386 CC objects to x64
   cp -f "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
+  # Recompile 386table.c with Move8 fix (ICE 97 → R_MAKESTRMOVE):
+  gcc -c -w -I"$OWROOT/bld/cg/intel/386/binbuild" \
+    -I"$OWROOT/bld/cg/h" -I"$OWROOT/bld/cg/intel/h" -I"$OWROOT/bld/cg/intel/386/h" \
+    -I"$OWROOT/bld/watcom/h" -I"$OWROOT/bld/comp_cfg/h" -I"$OWROOT/bld/owl/h" \
+    -I"$OWROOT/bld/dwarf/dw/h" -I"$OWROOT/bld/cfloat/h" \
+    -D_CPU=386 -DBOOTSTRAP -D__UNIX__ -D__LINUX__ \
+    "$OWROOT/bld/cg/intel/386/c/386table.c" -o "$OWROOT/bld/cg/intel/386/binbuild/386table.obj" 2>/dev/null
   # Recompile x64-specific files with _TARG_X64 (enables OMF→ELF64 conversion)
   X64FLAGS="-w -I$OWROOT/bld/cc/x64/binbuild -I$OWROOT/bld/cc/h -I$OWROOT/bld/cc/x64 \
     -I$OWROOT/bld/cg/h -I$OWROOT/bld/cg/intel/h -I$OWROOT/bld/cg/intel/386/h \

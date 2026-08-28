@@ -1257,7 +1257,9 @@ static const opcode_entry    Move8[] = {
 _OE( _Un(    R|M,  R|M,  EQ_R1 ),      V_NO,                RG_8,             G_NO,           FU_NO ),
 _OE( _Un(    M,    M,    NONE ),       V_SAME_LOCN,         RG_,              G_NO,           FU_NO ),
 _OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_8,             R_SPLITMOVE,    FU_NO ),
-_OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_,              G_UNKNOWN,      FU_NO ),
+_OE( _Un(    U,    ANY,  NONE ),       V_NO,                RG_,              R_FORCEOP1MEM,  FU_NO ),
+_OE( _Un(    ANY,  U,    NONE ),       V_NO,                RG_,              R_FORCERESMEM,  FU_NO ),
+_OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_,              R_MAKESTRMOVE,  FU_NO ),
 };
 
 /*
