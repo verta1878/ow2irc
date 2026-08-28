@@ -1557,7 +1557,9 @@ static const opcode_entry    Push8[] = {
 /*************************/
 /*           op1   op2   eq            verify               reg               gen             fu  */
 _OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_DBL,           R_SPLITUNARY,   FU_NO ),
-_OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_,              G_UNKNOWN,      FU_NO ),
+_OE( _Un(    U,    ANY,  NONE ),       V_NO,                RG_,              R_FORCEOP1MEM,  FU_NO ),
+_OE( _Un(    M,    ANY,  NONE ),       V_NO,                RG_,              R_DOLONGPUSH,   FU_NO ),
+_OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_,              R_MAKESTRMOVE,  FU_NO ),
 };
 
 /*
@@ -1571,7 +1573,7 @@ static const opcode_entry    PushXX[] = {
 /*           op1   op2   eq            verify               reg               gen             fu  */
 _OE( _Un(    U,    ANY,  NONE ),       V_NO,                RG_,              R_FORCEOP1MEM,  FU_NO ),
 _OE( _Un(    M,    ANY,  NONE ),       V_NO,                RG_,              R_DOLONGPUSH,   FU_NO ),
-_OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_,              G_UNKNOWN,      FU_NO ),
+_OE( _Un(    ANY,  ANY,  NONE ),       V_NO,                RG_,              R_MAKESTRMOVE,  FU_NO ),
 };
 
 

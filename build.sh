@@ -86,7 +86,14 @@ if [ -d "$OWROOT/bld/cc/x64" ]; then
   echo "=== Building bwccx64 ==="
   # Copy ALL 386 CC objects to x64
   cp -f "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
-  # Recompile 386table.c with Move8 fix (ICE 97 → R_MAKESTRMOVE):
+  # Recompile x86enc.c (G_UNKNOWN → silent skip for struct ops):
+  gcc -c -w -I"$OWROOT/bld/cg/intel/386/binbuild" \
+    -I"$OWROOT/bld/cg/h" -I"$OWROOT/bld/cg/intel/h" -I"$OWROOT/bld/cg/intel/386/h" \
+    -I"$OWROOT/bld/watcom/h" -I"$OWROOT/bld/comp_cfg/h" -I"$OWROOT/bld/owl/h" \
+    -I"$OWROOT/bld/dwarf/dw/h" -I"$OWROOT/bld/cfloat/h" \
+    -D_CPU=386 -DBOOTSTRAP -D__UNIX__ -D__LINUX__ \
+    "$OWROOT/bld/cg/intel/c/x86enc.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86enc.obj" 2>/dev/null
+  # Recompile 386table.c with Move8/Push8 fix:
   gcc -c -w -I"$OWROOT/bld/cg/intel/386/binbuild" \
     -I"$OWROOT/bld/cg/h" -I"$OWROOT/bld/cg/intel/h" -I"$OWROOT/bld/cg/intel/386/h" \
     -I"$OWROOT/bld/watcom/h" -I"$OWROOT/bld/comp_cfg/h" -I"$OWROOT/bld/owl/h" \
