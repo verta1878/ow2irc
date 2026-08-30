@@ -739,16 +739,32 @@ void X64ObjFini( void )
                     k += 2; continue;
                 }
 
-                /* A6) Pointer store/load truncation fix (-od).
-                 * At -od, the CG stores pointers as 32-bit (mov eax,[ebp+x])
-                 * which truncates 64-bit stack addresses.
-                 * Fix: promote ALL mov eax↔[rbp+disp8] to 64-bit with REX.W.
-                 * Safe: for ints, upper 32 bits are zero (zero-extend). */
-                if( (b0 == 0x89 || b0 == 0x8B) && b1 == 0x45 ) {
-                    /* 89 45 xx = mov [rbp+disp8], eax (store)
-                     * 8B 45 xx = mov eax, [rbp+disp8] (load)
-                     * Add REX.W → mov [rbp+disp8], rax / mov rax, [rbp+disp8] */
+                /* A6) Pointer/value truncation fix (-od).
+                 * At -od, the CG uses 32-bit operands for EBP-relative
+                 * accesses (mov, add, cmp, etc). On x64, pointers stored
+                 * on the stack need 64-bit operands.
+                 * Fix: promote ALL ops with modrm=0x45 (EBP+disp8, reg=EAX)
+                 * to 64-bit with REX.W. Safe: for ints, upper bits are zero. */
+                if( (b1 == 0x45 || b1 == 0x05) && b0 != 0xC7 && b0 != 0x0F
+                  && !(b0 >= 0xD8 && b0 <= 0xDF)   /* not x87 */
+                  && !(b0 >= 0x70 && b0 <= 0x7F)    /* not Jcc */
+                  && b0 != 0xFE && b0 != 0xF6 && b0 != 0xF7  /* not byte ops */
+                  && b0 != 0x80 && b0 != 0x83       /* not imm ALU */
+                  && b0 != 0x8D ) {                 /* not LEA (already ok) */
                     patched[p++] = 0x48;  /* REX.W */
+                    /* For EBP+disp8 with positive offset: double it.
+                     * i386 uses 4-byte push slots, x64 uses 8-byte.
+                     * Positive rbp offsets access caller's stack frame. */
+                    if( b1 == 0x45 && k + 2 < code_seg1_len ) {
+                        int8_t disp = (int8_t)code_seg1[k+2];
+                        if( disp > 0 && disp * 2 <= 127 ) {
+                            patched[p++] = b0;
+                            patched[p++] = b1;
+                            patched[p++] = (uint8_t)(int8_t)(disp * 2);
+                            k += 3;
+                            continue;
+                        }
+                    }
                     /* fall through to copy b0 */
                 }
 
@@ -884,11 +900,12 @@ void X64ObjFini( void )
                 for( int f = 0; f < fixup_count; f++ )
                     if( fixups[f].code_offset == k + 1 ) { is_addr = 1; break; }
                 if( is_addr ) {
-                    /* A1 → 8B 05 (MOV EAX,[RIP+disp32])
-                     * A3 → 89 05 (MOV [RIP+disp32],EAX)
-                     * RIP-relative: mod=00, reg=000(EAX), rm=101 */
+                    /* A1 → 48 8B 05 (MOV RAX,[RIP+disp32]) — 64-bit load
+                     * A3 → 48 89 05 (MOV [RIP+disp32],RAX) — 64-bit store
+                     * RIP-relative: mod=00, reg=000(RAX), rm=101 */
+                    patched[p++] = 0x48;    /* REX.W — 64-bit operand */
                     patched[p++] = ( b0 == 0xA1 ) ? 0x8B : 0x89;
-                    patched[p++] = 0x05;    /* ModR/M: mod=00 reg=EAX rm=101 (RIP) */
+                    patched[p++] = 0x05;    /* ModR/M: mod=00 reg=RAX rm=101 (RIP) */
                     offset_map[k+1] = p;
                     for( int d = 0; d < 4; d++ )
                         patched[p++] = code_seg1[k+1+d];
@@ -1088,7 +1105,8 @@ void X64ObjFini( void )
                     }
                     /* If prev byte looks like x87 opcode, require target byte
                      * to be a common jump-target opcode */
-                    if( p > 0 && code_seg1[p-1] >= 0xD8 && code_seg1[p-1] <= 0xDF ) {
+                    if( p > 0 && code_seg1[p-1] >= 0xD8 && code_seg1[p-1] <= 0xDF
+                      && !(p > 1 && code_seg1[p-2] == 0x84 && code_seg1[p-1] == 0xDB) ) {
                         int ok = 0;
                         if( (tgt_byte & 0xF0) == 0x40 ) ok = 1; /* REX prefix */
                         if( (tgt_byte & 0xF0) == 0x50 ) ok = 1; /* PUSH/POP */
