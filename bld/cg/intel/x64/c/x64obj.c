@@ -739,6 +739,19 @@ void X64ObjFini( void )
                     k += 2; continue;
                 }
 
+                /* A6) Pointer store/load truncation fix (-od).
+                 * At -od, the CG stores pointers as 32-bit (mov eax,[ebp+x])
+                 * which truncates 64-bit stack addresses.
+                 * Fix: promote ALL mov eax↔[rbp+disp8] to 64-bit with REX.W.
+                 * Safe: for ints, upper 32 bits are zero (zero-extend). */
+                if( (b0 == 0x89 || b0 == 0x8B) && b1 == 0x45 ) {
+                    /* 89 45 xx = mov [rbp+disp8], eax (store)
+                     * 8B 45 xx = mov eax, [rbp+disp8] (load)
+                     * Add REX.W → mov [rbp+disp8], rax / mov rax, [rbp+disp8] */
+                    patched[p++] = 0x48;  /* REX.W */
+                    /* fall through to copy b0 */
+                }
+
             }
 
             /* Phase 6: Detect function boundaries for .eh_frame FDEs.
