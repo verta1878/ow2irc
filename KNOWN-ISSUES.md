@@ -1,26 +1,27 @@
 # openwatcom2irc — Known Issues
 
-Status as of r0.6.0 (2026-08-28).
+Status as of r0.6.1 (2026-08-29).
 
-## All issues: RESOLVED
+## r0.6.1 — MinGW-w64 CRT Port
 
-No known issues. Clean compile, clean link, correct results at
-all optimization levels (-ox, -od, -oi, -ot, -oh, none).
-Zero warnings. Zero segfaults.
+### Complete
+- MinGW-w64 CRT ported (5,296 source files, 1,080 Win64 objects)
+- Portable CRT (math/string/gdtoa) builds for all targets
+- Win64 CRT verified: GUI + console apps link
+- Linux x64 CRT verified: printf works end-to-end
+- 14/14 Win64 API headers compile
+- Import libraries: lib64(480) + lib-common(822) + lib32(816)
+- Build scripts: build.sh, build_win64.sh, build_implibs.sh, build_all.sh
+- owlink wrapper for easy linking
+- cleanup.sh moves post-processor to attic
 
-## Future — Native x64 Code Generator
-Goal: no GCC dependency, self-hosted.
+### Not yet implemented
+- Win32 CRT build (needs i686-w64-mingw32-gcc cross compiler)
+- BSD / macOS target support (future)
+- Native x64 CG (sysop/0's _TARG_X64 paths need wiring)
 
-## Resolved
-- Float optimizer segfault at -oi/-ox/-ot/-oh (x64obj.c: branch
-  displacement fixup treated x87 modrm byte 0x74 as JE opcode,
-  corrupting FDIV SIB from 0x24/RSP to 0x25/RBP → segfault.
-  Fixed by excluding bytes preceded by x87 opcodes D8-DF)
-- ICE 97 / silent no-output on multi-field struct by-value
-- Multi-field struct pass-by-value wrong result
-- 2-field struct brace-init
-- .eh_frame linker warning (suppressed)
-- 32-bit pointer arithmetic (REX.W expansion pass)
-- ELF64 writer (12 bugs)
-- Build system (clean clone via bash build.sh)
-- Runtime (crt0_x64.S)
+### Known limitations
+- 28 CRT source files need MinGW's autoconf configure step
+  (inline override units, not user-facing functions)
+- bwccx64 uses 386 CG with post-processor for x64 output
+  (cleanup.sh attics the post-processor; native CG is future work)

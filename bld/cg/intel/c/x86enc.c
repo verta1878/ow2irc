@@ -2596,10 +2596,7 @@ void    GenObjCode( instruction *ins )
             AddToTemp( M_SECONDARY );
             break;
         case G_UNKNOWN:
-            /* Skip G_UNKNOWN silently — allows struct ops to proceed.
-             * The CG's register allocator uses G_UNKNOWN as a reduction
-             * fallback. Skipping it instead of crashing allows the code
-             * generator to continue and produce an object file. */
+            _Zoiks( ZOIKS_097 );
             break;
         default:
             _Zoiks( ZOIKS_028 );

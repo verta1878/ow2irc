@@ -86,13 +86,48 @@ if [ -d "$OWROOT/bld/cc/x64" ]; then
   echo "=== Building bwccx64 ==="
   # Copy ALL 386 CC objects to x64
   cp -f "$OWROOT/bld/cc/386/binbuild/"*.obj "$OWROOT/bld/cc/x64/binbuild/" 2>/dev/null
-  # Recompile x86enc.c (G_UNKNOWN → silent skip for struct ops):
-  gcc -c -w -I"$OWROOT/bld/cg/intel/386/binbuild" \
-    -I"$OWROOT/bld/cg/h" -I"$OWROOT/bld/cg/intel/h" -I"$OWROOT/bld/cg/intel/386/h" \
-    -I"$OWROOT/bld/watcom/h" -I"$OWROOT/bld/comp_cfg/h" -I"$OWROOT/bld/owl/h" \
-    -I"$OWROOT/bld/dwarf/dw/h" -I"$OWROOT/bld/cfloat/h" \
-    -D_CPU=386 -DBOOTSTRAP -D__UNIX__ -D__LINUX__ \
-    "$OWROOT/bld/cg/intel/c/x86enc.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86enc.obj" 2>/dev/null
+
+  # === r0.6.1: Recompile shared CG files with _TARG_X64 ===
+  # Enables sysop/0's native x64 code paths (REX.W at emit time,
+  # 64-bit operand handling, RIP-relative addressing, etc.)
+  echo "  Recompiling shared CG files with _TARG_X64..."
+
+  X64FLAGS="-w -D_CPU=386 -D_TARG_X64=1 -DBOOTSTRAP -D__UNIX__ -D__LINUX__"
+  X64INC="-I$OWROOT/bld/cg/intel/386/binbuild \
+    -I$OWROOT/bld/cg/h -I$OWROOT/bld/cg/intel/h \
+    -I$OWROOT/bld/cg/intel/386/h -I$OWROOT/bld/watcom/h \
+    -I$OWROOT/bld/comp_cfg/h -I$OWROOT/bld/owl/h \
+    -I$OWROOT/bld/dwarf/dw/h -I$OWROOT/bld/cfloat/h"
+
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/be.c" -o "$OWROOT/bld/cg/intel/386/binbuild/be.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/bldcall.c" -o "$OWROOT/bld/cg/intel/386/binbuild/bldcall.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/bldins.c" -o "$OWROOT/bld/cg/intel/386/binbuild/bldins.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/cgcli.c" -o "$OWROOT/bld/cg/intel/386/binbuild/cgcli.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/cvsyms.c" -o "$OWROOT/bld/cg/intel/386/binbuild/cvsyms.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/dfsyms.c" -o "$OWROOT/bld/cg/intel/386/binbuild/dfsyms.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/intrface.c" -o "$OWROOT/bld/cg/intel/386/binbuild/intrface.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/makeins.c" -o "$OWROOT/bld/cg/intel/386/binbuild/makeins.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/optab.c" -o "$OWROOT/bld/cg/intel/386/binbuild/optab.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/parm.c" -o "$OWROOT/bld/cg/intel/386/binbuild/parm.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/c/rtcall.c" -o "$OWROOT/bld/cg/intel/386/binbuild/rtcall.obj" 2>/dev/null
+
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/i87exp.c" -o "$OWROOT/bld/cg/intel/386/binbuild/i87exp.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/i87opt.c" -o "$OWROOT/bld/cg/intel/386/binbuild/i87opt.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/wvsupp.c" -o "$OWROOT/bld/cg/intel/386/binbuild/wvsupp.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86call.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86call.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86dfsup.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86dfsup.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86enc.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86enc.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86index.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86index.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86ldstr.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86ldstr.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86obj.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86obj.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86proc.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86proc.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86segs.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86segs.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86sel.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86sel.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86split.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86split.obj" 2>/dev/null
+  gcc -c $X64FLAGS $X64INC "$OWROOT/bld/cg/intel/c/x86ver.c" -o "$OWROOT/bld/cg/intel/386/binbuild/x86ver.obj" 2>/dev/null
+
+  echo "  25 CG files recompiled with _TARG_X64 ✅"
+
   # Recompile 386table.c with Move8/Push8 fix:
   gcc -c -w -I"$OWROOT/bld/cg/intel/386/binbuild" \
     -I"$OWROOT/bld/cg/h" -I"$OWROOT/bld/cg/intel/h" -I"$OWROOT/bld/cg/intel/386/h" \
@@ -174,7 +209,13 @@ fi
 
 # === OW2IRC: bwppx64 post-build ===
 if [ -d "$OWROOT/bld/plusplus/x64" ] && [ -d "$OWROOT/bld/plusplus/386/binbuild" ]; then
-  echo "=== Building bwppx64 ==="
+  echo "=== Building MinGW-w64 portable CRT ===
+echo "  Building libmingw64crt.a..."
+(cd "$OWROOT/bld/mingw64" && bash build.sh)
+echo "  Done."
+
+echo ""
+echo "=== Building bwppx64 ==="
   mkdir -p "$OWROOT/bld/plusplus/x64/binbuild"
   cp -f "$OWROOT/bld/plusplus/386/binbuild/"*.obj "$OWROOT/bld/plusplus/x64/binbuild/" 2>/dev/null
   cp -f "$OWROOT/bld/plusplus/386/binbuild/"*.gh  "$OWROOT/bld/plusplus/x64/binbuild/" 2>/dev/null
