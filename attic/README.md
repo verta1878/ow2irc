@@ -1,14 +1,15 @@
-# attic/ — removed x64 post-processor code
+# attic/ — x64 post-processor snapshots
 
-These files contain the post-processor heuristics that were used
-in r0.6.0 to make the 386 CG output run on x64. They worked
-(62/62 test battery) but were fragile — 17 separate hacks sharing
-one linear scan loop, each with edge cases that interacted.
-
-Replaced in r0.6.1 by MinGW-w64 CRT port + cleanup.
+Full working copies of the x64 post-processor files.
+These contain the 17 heuristics that make bwccx64 work
+until the native x64 CG replaces them.
 
 ## Files
-- x64obj_postprocessor.c — full x64obj.c with all 17 heuristics
-- x86enc_skip.patch — G_UNKNOWN skip (restored to Zoiks)
+- x64obj_postprocessor.c — x64obj.c with REX pass, branch fixup,
+  jump table rewrite, struct patterns, omap, is_branch
+- x86enc_with_skip.c — x86enc.c with G_UNKNOWN skip
+
+DO NOT strip these fixes from the live code until the
+native x64 CG is wired in and passes bob's battery.
 
 ## the crew 4free
