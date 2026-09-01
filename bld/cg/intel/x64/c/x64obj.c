@@ -745,12 +745,17 @@ void X64ObjFini( void )
                  * on the stack need 64-bit operands.
                  * Fix: promote ALL ops with modrm=0x45 (EBP+disp8, reg=EAX)
                  * to 64-bit with REX.W. Safe: for ints, upper bits are zero. */
-                if( (b1 == 0x45 || b1 == 0x05) && b0 != 0xC7 && b0 != 0x0F
-                  && !(b0 >= 0xD8 && b0 <= 0xDF)   /* not x87 */
-                  && !(b0 >= 0x70 && b0 <= 0x7F)    /* not Jcc */
-                  && b0 != 0xFE && b0 != 0xF6 && b0 != 0xF7  /* not byte ops */
-                  && b0 != 0x80 && b0 != 0x83       /* not imm ALU */
-                  && b0 != 0x8D ) {                 /* not LEA (already ok) */
+                if( (b1 == 0x45 || b1 == 0x05)
+                  && !(p > 0 && patched[p-1] == 0x0F) /* not 2-byte opcode */
+                  && !(p > 0 && patched[p-1] == 0x66) /* not 16-bit prefix */
+                  && ( b0 == 0x89 || b0 == 0x8B    /* MOV r↔m */
+                    || b0 == 0x01 || b0 == 0x03    /* ADD m,r / ADD r,m */
+                    || b0 == 0x29 || b0 == 0x2B    /* SUB m,r / SUB r,m */
+                    || b0 == 0x39 || b0 == 0x3B    /* CMP m,r / CMP r,m */
+                    || b0 == 0x09 || b0 == 0x0B    /* OR  m,r / OR  r,m */
+                    || b0 == 0x21 || b0 == 0x23    /* AND m,r / AND r,m */
+                    || b0 == 0x31 || b0 == 0x33    /* XOR m,r / XOR r,m */
+                    || b0 == 0x85 || b0 == 0x87 ) ) { /* TEST / XCHG */
                     patched[p++] = 0x48;  /* REX.W */
                     /* For EBP+disp8 with positive offset: double it.
                      * i386 uses 4-byte push slots, x64 uses 8-byte.
@@ -900,10 +905,15 @@ void X64ObjFini( void )
                 for( int f = 0; f < fixup_count; f++ )
                     if( fixups[f].code_offset == k + 1 ) { is_addr = 1; break; }
                 if( is_addr ) {
-                    /* A1 → 48 8B 05 (MOV RAX,[RIP+disp32]) — 64-bit load
-                     * A3 → 48 89 05 (MOV [RIP+disp32],RAX) — 64-bit store
-                     * RIP-relative: mod=00, reg=000(RAX), rm=101 */
-                    patched[p++] = 0x48;    /* REX.W — 64-bit operand */
+                    /* A1 → 8B 05 (MOV EAX,[RIP+disp32])
+                     * A3 → 89 05 (MOV [RIP+disp32],EAX)
+                     * Add REX.W ONLY if no 0x66 prefix (byte/word load).
+                     * With 0x66: char/short load → keep 32-bit. */
+                    if( p > 0 && patched[p-1] == 0x66 ) {
+                        /* 66 A1 = word load → 66 8B 05 (no REX.W) */
+                    } else {
+                        patched[p++] = 0x48;    /* REX.W — 64-bit operand */
+                    }
                     patched[p++] = ( b0 == 0xA1 ) ? 0x8B : 0x89;
                     patched[p++] = 0x05;    /* ModR/M: mod=00 reg=RAX rm=101 (RIP) */
                     offset_map[k+1] = p;
@@ -1711,6 +1721,9 @@ void X64ObjFini( void )
                     if( (prev >= 0xB8 && prev <= 0xBF) || prev == 0x68
                       || prev == 0x6A || prev == 0xC7 || prev == 0xFF
                       || prev == 0x85 || prev == 0x24 || prev == 0x25
+                      || (prev >= 0xE8 && prev <= 0xEF)  /* disp bytes */
+                      || (prev >= 0xF0 && prev <= 0xFF && prev != 0xFF)
+                      || prev == 0x45 || prev == 0x4D   /* modrm [rbp+d8] */
                       || off < (unsigned)code_start_saved ) {
                         SET64(rela.r_info, ELF64_R_INFO(anchor + 1, R_X86_64_32S));  /* +1 for STT_FILE */
                         /* If `within` points into code area, adjust via omap
