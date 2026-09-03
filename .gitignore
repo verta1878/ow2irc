@@ -15,7 +15,18 @@
 *.pch
 
 # Build output directories (inside bld/):
-**/binbuild/
+# Build artifacts (object files, executables, libraries)
+**/binbuild/*.obj
+**/binbuild/*.exe
+**/binbuild/*.lib
+**/binbuild/*.sym
+**/binbuild/*.map
+**/binbuild/*.err
+
+# Keep generated headers (.gh, .gc, .grh) — needed for bootstrap
+!**/binbuild/*.gh
+!**/binbuild/*.gc
+!**/binbuild/*.grh
 **/obj/
 
 # OS files:
