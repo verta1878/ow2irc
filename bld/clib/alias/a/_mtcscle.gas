@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcsclen
-_tcsclen:
-	j	_mbslen

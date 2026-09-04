@@ -1,4 +1,0 @@
-	.text
-	.globl	_execl
-_execl:
-	b	execl

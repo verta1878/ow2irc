@@ -1,3 +1,0 @@
-target_cpu = x64
-
-!include ../../master.mif

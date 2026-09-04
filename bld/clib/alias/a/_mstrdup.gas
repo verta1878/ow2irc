@@ -1,4 +1,0 @@
-	.text
-	.globl	_strdup
-_strdup:
-	j	strdup

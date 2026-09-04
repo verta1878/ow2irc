@@ -1,4 +1,0 @@
-	.text
-	.globl	_wcsdup
-_wcsdup:
-	j	wcsdup

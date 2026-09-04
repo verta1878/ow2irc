@@ -1,4 +1,0 @@
-	.text
-	.globl	_atoi64
-_atoi64:
-	j	atoll

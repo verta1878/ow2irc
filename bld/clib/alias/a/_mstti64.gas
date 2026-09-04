@@ -1,4 +1,0 @@
-	.text
-	.globl	_strtoi64
-_strtoi64:
-	j	strtoll

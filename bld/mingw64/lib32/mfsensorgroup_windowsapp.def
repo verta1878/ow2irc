@@ -1,6 +1,0 @@
-LIBRARY mfsensorgroup
-
-EXPORTS
-
-MFCreateSensorGroup@8
-MFCreateSensorStream@16

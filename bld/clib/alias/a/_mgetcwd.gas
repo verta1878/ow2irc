@@ -1,4 +1,0 @@
-	.text
-	.globl	_getcwd
-_getcwd:
-	j	getcwd

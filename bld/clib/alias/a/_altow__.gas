@@ -1,4 +1,0 @@
-	.text
-	.globl	_wltoa
-_wltoa:
-	br	_ltow

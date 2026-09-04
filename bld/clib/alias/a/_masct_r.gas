@@ -1,4 +1,0 @@
-	.text
-	.globl	asctime_r
-asctime_r:
-	j	_asctime

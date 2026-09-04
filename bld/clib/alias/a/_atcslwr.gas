@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcslwr
-_tcslwr:
-	br	_mbslwr

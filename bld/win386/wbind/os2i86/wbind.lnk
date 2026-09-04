@@ -1,2 +1,0 @@
-debug dwarf op nored op symfile op map, statics sys os2 pmc op stack=12k,heap=8k,newfile  
-file wbind.obj

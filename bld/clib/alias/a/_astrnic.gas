@@ -1,4 +1,0 @@
-	.text
-	.globl	strnicmp
-strnicmp:
-	br	_strnicmp

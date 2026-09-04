@@ -1,4 +1,0 @@
-	.text
-	.globl	gmtime_r
-gmtime_r:
-	j	_gmtime

@@ -1,4 +1,0 @@
-	.text
-	.globl	bcmp
-bcmp:
-	j	memcmp

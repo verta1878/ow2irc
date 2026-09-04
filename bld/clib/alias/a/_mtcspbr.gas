@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcspbrk
-_tcspbrk:
-	j	_mbspbrk

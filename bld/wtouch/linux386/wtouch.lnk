@@ -1,5 +1,0 @@
-debug dwarf op nored op symfile op map, statics sys linux   
-file touch.obj
-file dtparse.obj
-file wtmsg.obj
-library ../../../bld/wres/linux386/mf_r/wres.lib

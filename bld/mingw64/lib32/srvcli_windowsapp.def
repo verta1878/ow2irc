@@ -1,5 +1,0 @@
-LIBRARY srvcli
-
-EXPORTS
-
-NetShareEnum@28

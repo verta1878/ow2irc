@@ -1,5 +1,0 @@
-# asclient.mif — inline assembler client for CC
-# tree_depth is set by CC master.mif (= 4).
-# From binbuild: ../../../../bld/wasm
-wasm_dir = $(depth_$(tree_depth))bld/wasm
-!include $(wasm_dir)/client.mif

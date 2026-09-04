@@ -1,4 +1,0 @@
-	.text
-	.globl	lstat
-lstat:
-	b	stat

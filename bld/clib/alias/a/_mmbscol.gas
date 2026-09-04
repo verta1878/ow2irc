@@ -1,4 +1,0 @@
-	.text
-	.globl	_mbscoll
-_mbscoll:
-	j	_mbscmp

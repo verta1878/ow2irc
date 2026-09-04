@@ -1,4 +1,0 @@
-	.text
-	.globl	strlwr
-strlwr:
-	j	_strlwr

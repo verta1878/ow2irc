@@ -1,4 +1,0 @@
-	.text
-	.globl	chsize
-chsize:
-	br	_chsize

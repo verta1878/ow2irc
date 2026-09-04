@@ -1,4 +1,0 @@
-	.text
-	.globl	_ui64toa
-_ui64toa:
-	b	ulltoa

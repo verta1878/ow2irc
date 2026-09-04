@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcschr
-_tcschr:
-	b	_mbschr

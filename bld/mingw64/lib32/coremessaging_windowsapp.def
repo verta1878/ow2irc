@@ -1,5 +1,0 @@
-LIBRARY coremessaging
-
-EXPORTS
-
-CreateDispatcherQueueController@16

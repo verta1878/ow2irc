@@ -1,6 +1,0 @@
-debug dwarf op nored op symfile op map, statics sys os2v2   
-file stidedrv.obj
-file idemsgfm.obj
-file maindrv.obj
-library wlinkd.lib
-library ../../../bld/wres/os2386.rtd/mf_r/wres.lib

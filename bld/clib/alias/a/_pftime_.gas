@@ -1,4 +1,0 @@
-	.text
-	.globl	_ftime
-_ftime:
-	b	ftime

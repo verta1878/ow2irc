@@ -1,5 +1,0 @@
-LIBRARY wintrust
-
-EXPORTS
-
-WinVerifyTrust@12

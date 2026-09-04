@@ -1,9 +1,0 @@
-#define VERINFO_EXE
-#define VERINFO_FILEVERSION         2, 0, 0x6a8e, 0x6c4
-#define VERINFO_PRODUCTVERSION      2, 0, 0x6a8e, 0x6c4
-#define VERINFO_FILEDESCRIPTION_STR "Open Watcom Assembler for X86"
-#define VERINFO_FILEVERSION_STR     "2.0"
-#define VERINFO_INTERNALNAME_STR    "wasm"
-#define VERINFO_PRODUCTVERSION_STR  "2.0"
-
-#include "cmnvinfo.rc"

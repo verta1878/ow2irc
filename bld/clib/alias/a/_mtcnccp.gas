@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcsnccpy
-_tcsnccpy:
-	j	_mbsncpy

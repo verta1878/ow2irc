@@ -1,4 +1,0 @@
-	.text
-	.globl	timegm
-timegm:
-	br	_mkgmtime

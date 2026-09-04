@@ -1,5 +1,0 @@
-LIBRARY netutils
-
-EXPORTS
-
-NetApiBufferFree@4

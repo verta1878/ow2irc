@@ -1,4 +1,0 @@
-	.text
-	.globl	_wutoa
-_wutoa:
-	br	_utow

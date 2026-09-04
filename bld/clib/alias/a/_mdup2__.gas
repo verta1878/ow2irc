@@ -1,4 +1,0 @@
-	.text
-	.globl	_dup2
-_dup2:
-	j	dup2

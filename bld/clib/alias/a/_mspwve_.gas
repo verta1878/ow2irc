@@ -1,4 +1,0 @@
-	.text
-	.globl	_spawnve
-_spawnve:
-	j	spawnve

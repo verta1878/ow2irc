@@ -1,4 +1,0 @@
-	.text
-	.globl	isleadbyte
-isleadbyte:
-	j	_ismbblead

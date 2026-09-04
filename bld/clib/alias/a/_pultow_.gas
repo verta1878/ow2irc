@@ -1,4 +1,0 @@
-	.text
-	.globl	_wultoa
-_wultoa:
-	b	_ultow

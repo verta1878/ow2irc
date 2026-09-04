@@ -1,4 +1,0 @@
-	.text
-	.globl	_open
-_open:
-	b	open

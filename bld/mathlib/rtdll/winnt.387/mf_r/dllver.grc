@@ -1,8 +1,0 @@
-#define VERINFO_FILEVERSION         2, 0, 0x6a8d, 0xd60c
-#define VERINFO_PRODUCTVERSION      2, 0, 0x6a8d, 0xd60c
-#define VERINFO_FILEDESCRIPTION_STR "Open Watcom Math Runtime Library (DLL)"
-#define VERINFO_FILEVERSION_STR     "2.0"
-#define VERINFO_INTERNALNAME_STR    "mt7r20"
-#define VERINFO_PRODUCTVERSION_STR  "2.0"
-
-#include "cmnvinfo.rc"

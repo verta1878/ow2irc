@@ -1,4 +1,0 @@
-	.text
-	.globl	filelength
-filelength:
-	br	_filelength

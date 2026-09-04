@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcsnextc
-_tcsnextc:
-	j	_mbsnextc

@@ -1,4 +1,0 @@
-	.text
-	.globl	_spawnl
-_spawnl:
-	j	spawnl

@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcsdec
-_tcsdec:
-	br	_mbsdec

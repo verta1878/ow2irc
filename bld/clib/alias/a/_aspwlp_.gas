@@ -1,4 +1,0 @@
-	.text
-	.globl	_spawnlp
-_spawnlp:
-	br	spawnlp

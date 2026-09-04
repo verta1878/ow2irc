@@ -1,5 +1,0 @@
-debug dwarf op nored op symfile op map, statics sys os2 pmc   
-file fcenable.obj
-file mem.obj
-file records.obj
-file spawn.obj

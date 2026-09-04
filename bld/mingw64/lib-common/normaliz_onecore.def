@@ -1,4 +1,0 @@
-LIBRARY "Normaliz.dll"
-EXPORTS
-IdnToAscii
-IdnToUnicode

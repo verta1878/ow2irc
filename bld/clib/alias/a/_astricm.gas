@@ -1,4 +1,0 @@
-	.text
-	.globl	stricmp
-stricmp:
-	br	_stricmp

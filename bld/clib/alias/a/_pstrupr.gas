@@ -1,4 +1,0 @@
-	.text
-	.globl	strupr
-strupr:
-	b	_strupr

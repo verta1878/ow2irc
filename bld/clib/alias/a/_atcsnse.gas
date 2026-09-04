@@ -1,4 +1,0 @@
-	.text
-	.globl	_tcsnset
-_tcsnset:
-	br	_mbsnbset

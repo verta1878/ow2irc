@@ -1,4 +1,0 @@
-	.text
-	.globl	_itoa
-_itoa:
-	br	itoa

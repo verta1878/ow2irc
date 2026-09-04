@@ -1,7 +1,0 @@
-debug dwarf op nored op symfile op map, statics sys nt_dll initinstance terminstance  option impfile=mt7r20.ilb reference __DLLstart_ disable 121 
-file ../../../../../bld/clib/startup/library/winnt.386/mf_r/clibdwnt.obj
-library ../../../../../bld/mathlib/library/winnt.387/mf_r.dll/math387r.lib
-library ../../../../../bld/clib/rtdll/winnt.386/mf_r/clbrdll.lib
-export { @../../../../../bld/mathlib/library/winnt.387/mf_r.dll/export.gdf }
-export { @../../../../../bld/mathlib/export.387 }
-export { @../../../../../bld/mathlib/register.387 }

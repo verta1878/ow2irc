@@ -1,4 +1,0 @@
-	.text
-	.globl	localtime_r
-localtime_r:
-	j	_localtime

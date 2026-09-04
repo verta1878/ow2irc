@@ -1,4 +1,0 @@
-	.text
-	.globl	_chdir
-_chdir:
-	b	chdir

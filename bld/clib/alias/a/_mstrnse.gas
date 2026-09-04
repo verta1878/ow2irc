@@ -1,4 +1,0 @@
-	.text
-	.globl	strnset
-strnset:
-	j	_strnset

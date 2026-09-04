@@ -1,4 +1,0 @@
-	.text
-	.globl	setmode
-setmode:
-	b	_setmode

@@ -1,4 +1,0 @@
-	.text
-	.globl	memicmp
-memicmp:
-	br	_memicmp

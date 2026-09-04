@@ -1,4 +1,0 @@
-	.text
-	.globl	onexit
-onexit:
-	j	_onexit
